@@ -9,6 +9,7 @@
     "dev": "node-dev --respawn ./index.js",
     "start": "node index.js",
     "db:up": "docker-compose up -d db",
+    "prisma:generate": "prisma generate",
     "migrate:deploy": "npx prisma migrate deploy"
   },
   "repository": {

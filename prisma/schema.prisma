@@ -27,58 +27,66 @@ model User {
 
 model Messager {
   id   Int    @id @default(autoincrement())
+  code String @unique
   name String
 
   messagerUsers    MessagerUser[]
   messagerChannels MessagerChannel[]
   messagerLabels   MessagerLabel[]
   messagerChats    MessagerChat[]
+
+  @@map(name: "messagers")
 }
 
 model MessagerUser {
   id Int @id @default(autoincrement())
 
-  messagerId Int
+  messagerId Int      @map("messager_id")
   messager   Messager @relation(fields: [messagerId], references: [id], onDelete: SetNull)
 
   userId Int
   user   User @relation(fields: [userId], references: [id], onDelete: SetNull)
 
-  uid String
+  uid String @db.VarChar(256)
 
   channels MessagerUserChannel[]
   chats    MessagerChat[]
 
+  @@unique([uid, messagerId])
   @@map(name: "messager_users")
 }
 
 model MessagerChat {
   id Int @id @default(autoincrement())
 
-  messagerId Int
+  uid String @db.VarChar(256)
+
+  messagerId Int      @map("messager_id")
   messager   Messager @relation(fields: [messagerId], references: [id], onDelete: SetNull)
 
-  messagerUserId Int
+  messagerUserId Int          @map("messager_user_id")
   messagerUser   MessagerUser @relation(fields: [messagerUserId], references: [id], onDelete: SetNull)
 
   orderMessages OrderMessage[]
 
+  @@unique([uid, messagerId])
   @@map(name: "messager_chats")
 }
 
 model MessagerChannel {
   id Int @id @default(autoincrement())
 
-  messagerId Int
+  messagerId Int      @map("messager_id")
   messager   Messager @relation(fields: [messagerId], references: [id], onDelete: SetNull)
 
   name String?
-  uid  String  @unique
+  uid  String  @db.VarChar(256)
 
   messager_users MessagerUserChannel[]
   labels         MessagerChannelLabel[]
   orderMessages  OrderMessage[]
 
+  @@unique([uid, messagerId])
   @@map(name: "messager_channels")
 }
 
@@ -96,7 +104,7 @@ model MessagerUserChannel {
 model MessagerLabel {
   id Int @id @default(autoincrement())
 
-  messagerId Int
+  messagerId Int      @map("messager_id")
   messager   Messager @relation(fields: [messagerId], references: [id], onDelete: SetNull)
 
   name String?
@@ -115,7 +123,7 @@ model MessagerChannelLabel {
   messagerChannel   MessagerChannel @relation(fields: [messagerChannelId], references: [id], onDelete: SetNull)
 
   @@id([messagerlabelCode, messagerChannelId])
-  @@map(name: "messager_channel_labels")
+  @@map(name: "messager_channels_labels")
 }
 
 model Order {

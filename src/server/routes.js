@@ -1,27 +1,27 @@
-import calls from "./apps/calls.js";
+import bot from "../tgbot/index.js";
+import callsApp from "./apps/callsApp.js";
+import tgApp from "./apps/tgApp.js";
 
 /**
- * Repeats some text a given number of times.
+ * Handles every Telephone exchange API event
  *
  * @param {import('express').Request} req - The text to repeat
  * @param {import('express').Response} res - Number of times
  */
 export const callsEntry = (req, res) => {
-  const result = calls.handleRequest(req.body);
+  const result = callsApp.handleRequest(req.body);
   res.status(200).json(result);
 };
 
 /**
- * Repeats some text a given number of times.
+ * Handles every Telelegram Bot API event (WebHook)
  *
  * @param {import('express').Request} req - The text to repeat
  * @param {import('express').Response} res - Number of times
  */
-export const tgBotWebHook = (req, res) => {
-  const book = req.body;
-
-  // Output the book to the console for debugging
-  console.log(book);
-
-  res.send("Book is added to the database");
+export const tgBotWebHook = async (req, res) => {
+  const { prisma } = req.app
+  await tgApp.preprocessMessage(prisma, req.body);
+  bot.processUpdate(req.body);
+  res.sendStatus(200);
 };
