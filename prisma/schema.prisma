@@ -140,20 +140,24 @@ model Order {
   createdAt       DateTime      @default(now()) @map("created_at") @db.Timestamptz(3)
   updatedAt       DateTime      @default(now()) @map("updated_at") @db.Timestamptz(3)
 
+  messages OrderMessage[]
+
   @@map(name: "orders")
 }
 
 model OrderMessage {
   id         Int    @id @default(autoincrement())
-  messageUid String
-  chatUid    String
-  orderId    Int
+  messageUid String @map("message_uid")
+  chatUid    String @map("chat_uid")
 
-  messagerChannelId Int
-  messagerChannel   MessagerChannel @relation(fields: [messagerChannelId], references: [id], onDelete: SetNull)
+  orderId Int
+  order   Order @relation(fields: [orderId], references: [id], onDelete: SetNull)
 
-  messagerChatId Int
-  messagerChats  MessagerChat @relation(fields: [messagerChatId], references: [id], onDelete: SetNull)
+  messagerChannelId Int?             @map("messager_channel_id")
+  messagerChannel   MessagerChannel? @relation(fields: [messagerChannelId], references: [id], onDelete: SetNull)
+
+  messagerChatId Int?          @map("messager_chat_id")
+  messagerChats  MessagerChat? @relation(fields: [messagerChatId], references: [id], onDelete: SetNull)
 
   @@map(name: "order_messages")
 }

@@ -21,7 +21,10 @@ export const callsEntry = (req, res) => {
  */
 export const tgBotWebHook = async (req, res) => {
   const { prisma } = req.app
+  
   await tgApp.preprocessMessage(prisma, req.body);
+
   bot.processUpdate(req.body);
+  
   res.sendStatus(200);
 };
