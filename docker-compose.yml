@@ -1,0 +1,43 @@
+version: '3'
+
+volumes:
+    db_data: {}
+
+services:
+    nodejs:
+        container_name: mega_bot
+        ports:
+            - 3030:3030
+        networks:
+            mega_crm:
+        environment:
+            - LOGS_PATH=${LOGS_PATH}
+        volumes:
+            - "./logs/back/:${LOGS_PATH}"
+        build:
+            context: .
+            dockerfile: docker/Dockerfile
+        restart: always
+        depends_on:
+            - db
+        links:
+            - db
+        command: [ "/bin/sh", "-c", "npm run migrate:deploy && npm run start" ]
+    db:
+        container_name: mega_db
+        image: postgres
+        restart: always
+        environment:
+            - POSTGRES_DB=${DB_NAME}
+            - POSTGRES_USER=${DB_USER}
+            - POSTGRES_PASSWORD=${DB_PASS}
+        networks:
+            mega_crm:
+        ports:
+            - 54324:5432
+        volumes:
+            - ./docker/postgres/:/docker-entrypoint-initdb.d/
+            - db_data:/var/lib/postgresql/data
+
+networks:
+    mega_crm:

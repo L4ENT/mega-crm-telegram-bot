@@ -1,0 +1,151 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+enum OrderStatuses {
+  NEW
+  ASSIGNED
+  DONE
+}
+
+model User {
+  id       Int     @id @default(autoincrement())
+  username String?
+
+  messagerUsers MessagerUser[]
+
+  @@map(name: "users")
+}
+
+model Messager {
+  id   Int    @id @default(autoincrement())
+  name String
+
+  messagerUsers    MessagerUser[]
+  messagerChannels MessagerChannel[]
+  messagerLabels   MessagerLabel[]
+  messagerChats    MessagerChat[]
+}
+
+model MessagerUser {
+  id Int @id @default(autoincrement())
+
+  messagerId Int
+  messager   Messager @relation(fields: [messagerId], references: [id], onDelete: SetNull)
+
+  userId Int
+  user   User @relation(fields: [userId], references: [id], onDelete: SetNull)
+
+  uid String
+
+  channels MessagerUserChannel[]
+  chats    MessagerChat[]
+
+  @@map(name: "messager_users")
+}
+
+model MessagerChat {
+  id Int @id @default(autoincrement())
+
+  messagerId Int
+  messager   Messager @relation(fields: [messagerId], references: [id], onDelete: SetNull)
+
+  messagerUserId Int
+  messagerUser   MessagerUser @relation(fields: [messagerUserId], references: [id], onDelete: SetNull)
+
+  orderMessages OrderMessage[]
+
+  @@map(name: "messager_chats")
+}
+
+model MessagerChannel {
+  id Int @id @default(autoincrement())
+
+  messagerId Int
+  messager   Messager @relation(fields: [messagerId], references: [id], onDelete: SetNull)
+
+  name String?
+  uid  String  @unique
+
+  messager_users MessagerUserChannel[]
+  labels         MessagerChannelLabel[]
+  orderMessages  OrderMessage[]
+
+  @@map(name: "messager_channels")
+}
+
+model MessagerUserChannel {
+  messagerUserId Int          @map("messager_user_id")
+  messagerUser   MessagerUser @relation(fields: [messagerUserId], references: [id], onDelete: SetNull)
+
+  messagerChannelId Int             @map("messager_channel_id")
+  messagerChannel   MessagerChannel @relation(fields: [messagerChannelId], references: [id], onDelete: SetNull)
+
+  @@id([messagerUserId, messagerChannelId])
+  @@map(name: "messager_users_channels")
+}
+
+model MessagerLabel {
+  id Int @id @default(autoincrement())
+
+  messagerId Int
+  messager   Messager @relation(fields: [messagerId], references: [id], onDelete: SetNull)
+
+  name String?
+  code String  @unique @db.VarChar(64)
+
+  channels MessagerChannelLabel[]
+
+  @@map(name: "messager_labels")
+}
+
+model MessagerChannelLabel {
+  messagerlabelCode String        @map("messager_label_code")
+  messagerLabel     MessagerLabel @relation(fields: [messagerlabelCode], references: [code], onDelete: SetNull)
+
+  messagerChannelId Int             @map("messager_channel_id")
+  messagerChannel   MessagerChannel @relation(fields: [messagerChannelId], references: [id], onDelete: SetNull)
+
+  @@id([messagerlabelCode, messagerChannelId])
+  @@map(name: "messager_channel_labels")
+}
+
+model Order {
+  id              Int           @id @default(autoincrement())
+  clientName      String        @map("client_name")
+  date            DateTime
+  additionalPhone String        @map("additional_phone") @db.VarChar(64)
+  fullAddress     String        @map("full_address")
+  defect          String        @db.VarChar(128)
+  brand           String        @db.VarChar(128)
+  model           String        @db.VarChar(128)
+  deviceType      String        @map("device_type") @db.VarChar(128)
+  status          OrderStatuses @default(NEW)
+  createdAt       DateTime      @default(now()) @map("created_at") @db.Timestamptz(3)
+  updatedAt       DateTime      @default(now()) @map("updated_at") @db.Timestamptz(3)
+
+  @@map(name: "orders")
+}
+
+model OrderMessage {
+  id         Int    @id @default(autoincrement())
+  messageUid String
+  chatUid    String
+  orderId    Int
+
+  messagerChannelId Int
+  messagerChannel   MessagerChannel @relation(fields: [messagerChannelId], references: [id], onDelete: SetNull)
+
+  messagerChatId Int
+  messagerChats  MessagerChat @relation(fields: [messagerChatId], references: [id], onDelete: SetNull)
+
+  @@map(name: "order_messages")
+}
