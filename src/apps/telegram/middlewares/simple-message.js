@@ -1,23 +1,6 @@
-import messagerModel from "../../model/messager/messagerModel.js";
-import MessagerRepository from "../../repository/messager-repository.js";
-
-const splitMessageToEntities = (jsonBody) => {
-  const {
-    message: { from, chat },
-  } = jsonBody;
-  return {
-    tgUser: from,
-    tgChannel: chat.type === "group" ? chat : null,
-    tgChat: chat.type === "private" ? chat : null,
-  };
-};
-
-export default {
-  async preprocessMessage(prisma, jsonBody) {
-    if(!jsonBody.from) {
-      return
-    }
-    const { tgUser, tgChannel, tgChat } = splitMessageToEntities(jsonBody);
+async function simpleMessageMiddleware(prisma, update) {
+    return
+    const { tgUser, tgChannel, tgChat } = splitMessageToEntities(update);
     const messager = await messagerModel.getUnique(prisma, {
       code: "telegram",
     });
@@ -78,8 +61,8 @@ export default {
             connect: {
               messagerUserId_messagerChannelId: {
                 messagerUserId: mUser.id,
-                messagerChannelId: mChannel.id 
-              }
+                messagerChannelId: mChannel.id,
+              },
             },
           },
         },
@@ -87,5 +70,6 @@ export default {
     }
 
     return jsonBody;
-  },
-};
+  }
+
+export default simpleMessageMiddleware

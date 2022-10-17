@@ -1,8 +1,8 @@
-import bot from "../tgbot/index.js";
-import CallsApp, { CallRequestDto } from "./apps/callsApp.js";
-import messagerModel from "../model/messager/messagerModel.js";
-import tgApp from "./apps/tgApp.js";
 import moment from "moment";
+import CallsApp from "../apps/calls/CallsApp.js";
+import messagerModel from "../model/messager/messagerModel.js";
+import CallRequestDto from "../apps/calls/dto/CallRequestDto.js";
+import TelegramApp from "../apps/telegram/TelegramApp.js";
 
 /**
  * Handles every Telephone exchange API event
@@ -26,7 +26,7 @@ export const callsEntry = async (req, res) => {
     body.link
   )
   const callsApp = new CallsApp(prisma, messager);
-  const result = callsApp.process(dto);
+  const result = callsApp.processRequest(dto);
   
   res.status(200).json(result);
 };
@@ -40,9 +40,9 @@ export const callsEntry = async (req, res) => {
 export const tgBotWebHook = async (req, res) => {
   const { prisma } = req.app;
   
-  await tgApp.preprocessMessage(prisma, req.body);
+  const telegramApp = new TelegramApp(prisma)
 
-  bot.processUpdate(req.body);
+  await telegramApp.processUpdate(req.body);
 
   res.sendStatus(200);
 };

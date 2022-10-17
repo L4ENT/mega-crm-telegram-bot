@@ -1,15 +1,21 @@
 import TelegramBot from "node-telegram-bot-api";
+import TelegramApp from "../apps/telegram/TelegramApp.js";
 import config from "../config.js";
-
-import * as handlers from './handlers.js'
 
 const bot = new TelegramBot(config.BOT_TOKEN)
 
 bot.setWebHook(`${config.PUBLIC_URL}/bot${config.BOT_TOKEN}`);
 
-bot.on("message", handlers.pingPong);
+bot.on("message", (msg) => {
+    const telegramApp = new TelegramApp()
+    telegramApp.processMessage(msg)
+});
 
-bot.on("callback_query", handlers.callbakck);
+bot.on("callback_query", (cbq) => {
+    console.log('asdasd')
+    const telegramApp = new TelegramApp()
+    telegramApp.processCallbackQuery(cbq)
+});
 
 
 export default bot

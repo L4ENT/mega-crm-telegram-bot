@@ -1,0 +1,10 @@
+const CallStatuses = {
+  SUCCESS: "SUCCESS",
+  MISSED: "MISSED",
+  CANCEL: "CANCEL",
+  NOTAVAILABLE: "NOTAVAILABLE",
+  NOTALLOWED: "NOTALLOWED",
+  NOTFOUND: "NOTFOUND",
+};
+
+export default CallStatuses;
