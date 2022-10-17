@@ -19,10 +19,12 @@ export default {
       code: "telegram",
     });
     console.log({ tgUser, tgChannel, tgChat });
-    
+
     const mUserRep = new MessagerRepository(prisma.messagerUser, messager);
     const mUser = await mUserRep.upsert({
-      where: { uid_messagerId: { uid: tgUser.username, messagerId: messager.id} },
+      where: {
+        uid_messagerId: { uid: tgUser.username, messagerId: messager.id },
+      },
       create: {
         uid: tgUser.username,
         user: { create: { username: tgUser.username } },
@@ -32,14 +34,19 @@ export default {
     if (tgChat) {
       const mChatRep = new MessagerRepository(prisma.messagerChat, messager);
       await mChatRep.upsert({
-        where: { uid_messagerId: { uid: tgChat.id.toString(), messagerId: messager.id} },
+        where: {
+          uid_messagerId: {
+            uid: tgChat.id.toString(),
+            messagerId: messager.id,
+          },
+        },
         create: {
           uid: tgChat.id.toString(),
           messagerUser: {
             connect: {
-              id: mUser.id
-            }
-          }
+              id: mUser.id,
+            },
+          },
         },
       });
     }
@@ -49,10 +56,37 @@ export default {
         prisma.messagerChannel,
         messager
       );
-      await mChannelRep.upsert({
-        where: { uid_messagerId: { uid: tgChannel.id.toString(), messagerId: messager.id} },
+      const mChannel = await mChannelRep.upsert({
+        where: {
+          uid_messagerId: {
+            uid: tgChannel.id.toString(),
+            messagerId: messager.id,
+          },
+        },
         create: { uid: tgChannel.id.toString(), name: tgChannel.title },
         update: { uid: tgChannel.id.toString(), name: tgChannel.title },
+      });
+
+      await mUserRep.update({
+        where: {
+          uid_messagerId: { uid: tgUser.username, messagerId: messager.id },
+        },
+        data: {
+          channels: {
+            connectOrCreate: {
+              where: {
+                messagerUserId_messagerChannelId: {
+                  messagerUserId: tgUser.id,
+                  messagerChannelId: mChannel.id,
+                },
+                
+              },
+              create: {
+                messagerChannelId: mChannel.id,
+              }
+            },
+          },
+        },
       });
     }
 

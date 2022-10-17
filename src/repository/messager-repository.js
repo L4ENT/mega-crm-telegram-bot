@@ -32,6 +32,9 @@ export default class MessagerRepository extends BaseRepository {
         }
       })
     }
+    async update(opts) {
+      return await this.prismaModel.update(opts)
+    }
     async upsert(opts) {
       return await this.prismaModel.upsert({
         ...opts,
