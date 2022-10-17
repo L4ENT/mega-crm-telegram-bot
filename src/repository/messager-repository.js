@@ -19,7 +19,7 @@ export default class MessagerRepository extends PrismaRepository {
         ...opts,
         where: {
           ...opts.where,
-          messagerId: this.messager.id.toString()
+          messagerId: this.messager.id
         }
       })
     }

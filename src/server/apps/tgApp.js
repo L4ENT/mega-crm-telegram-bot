@@ -14,11 +14,13 @@ const splitMessageToEntities = (jsonBody) => {
 
 export default {
   async preprocessMessage(prisma, jsonBody) {
+    if(!jsonBody.from) {
+      return
+    }
     const { tgUser, tgChannel, tgChat } = splitMessageToEntities(jsonBody);
     const messager = await messagerModel.getUnique(prisma, {
       code: "telegram",
     });
-    console.log({ tgUser, tgChannel, tgChat });
 
     const mUserRep = new MessagerRepository(prisma.messagerUser, messager);
     const mUser = await mUserRep.upsert({
@@ -73,16 +75,10 @@ export default {
         },
         data: {
           channels: {
-            connectOrCreate: {
-              where: {
-                messagerUserId_messagerChannelId: {
-                  messagerUserId: tgUser.id,
-                  messagerChannelId: mChannel.id,
-                },
-                
-              },
-              create: {
-                messagerChannelId: mChannel.id,
+            connect: {
+              messagerUserId_messagerChannelId: {
+                messagerUserId: mUser.id,
+                messagerChannelId: mChannel.id 
               }
             },
           },

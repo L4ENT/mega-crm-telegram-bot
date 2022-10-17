@@ -1,5 +1,6 @@
 import moment from "moment";
-import MessagerRepository from "../../repository/messager-repository";
+import MessagerRepository from "../../repository/messager-repository.js";
+import bot from "../../tgbot/index.js";
 
 const CallStatuses = {
   SUCCESS: "SUCCESS",
@@ -15,7 +16,7 @@ const CallTypes = {
   OUT: "OUT",
 };
 
-class CallRequestDto {
+export class CallRequestDto {
   /**
    * DTO for every Telephone exchange API request
    * @param {string} type - CallTypes
@@ -39,7 +40,7 @@ class CallRequestDto {
     this.status = status;
     this.clientPhone = clientPhone;
     this.timeStart = timeStart;
-    this.typduratione = duration;
+    this.duration = duration;
     this.callId = callId;
     this.recordLink = recordLink;
   }
@@ -52,8 +53,11 @@ class CallsApp {
    * @param {import('@prisma/client').Prisma} prisma
    */
   constructor(prisma, messager) {
-    this.prisma = prisma
-    this.messagerChannelRepository = new MessagerRepository(prisma.messagerChannel, messager)
+    this.prisma = prisma;
+    this.messagerChannelRepository = new MessagerRepository(
+      prisma.messagerChannel,
+      messager
+    );
   }
 
   /**
@@ -63,16 +67,33 @@ class CallsApp {
    */
   async process(dto) {
     if (dto.type == CallTypes.OUT) {
-      await this.sendOutCallChannelMessage(dto);
+      await this.sendOutCallChannel(dto);
     }
 
     if (dto.status == CallStatuses.SUCCESS) {
-      await this.sendSuccessChannelMessage(dto);
+      await this.sendSuccessChannel(dto);
     }
 
     if (dto.status == CallStatuses.MISSED) {
-      await this.sendMissedChannelMessage(dto);
+      await this.sendMissedChannel(dto);
     }
+  }
+
+  /**
+   * Sends all out-calls to specified channel
+   *
+   * @param {CallRequestDto} dto
+   */
+  formatMessage(dto) {
+    return (
+      `${dto.type === CallTypes.IN ? "Входящий" : "Исходящий"} звонок\n\n` +
+      `<b>Поступил</b>: ${moment(dto.timeStart).format(
+        "DD.MM.YYYY hh:mm:ss"
+      )}\n` +
+      `<b>Номер</b>: ${dto.clientPhone}\n` +
+      `<b>Продолжительность</b>: ${dto.duration} сек.\n` +
+      `<b>Запись</b>: <a href="${dto.recordLink}">${dto.recordLink}</a>\n`
+    );
   }
 
   /**
@@ -82,16 +103,64 @@ class CallsApp {
    */
   async sendOutCallChannel(dto) {
     const channels = await this.messagerChannelRepository.findMany({
-        where: {
-            channels: {
-                some: {
-                    messagerChannel: {
-                        messagerlabelCode: 'CALLS_OUTCOMING'
-                    }
-                }
-            }
-        }
-    })
+      where: {
+        labels: {
+          some: {
+            messagerLabel: {
+              code: "CALLS_OUTCOMING",
+            },
+          },
+        },
+      },
+    });
+
+    const message = this.formatMessage(dto);
+
+    for (let channel of channels) {
+      await bot.sendMessage(channel.uid, message, {
+        parse_mode: "HTML",
+        reply_markup: {
+          inline_keyboard: [
+            [
+              {
+                text: "Заявка",
+                callback_data: JSON.stringify({
+                    cmd: "order:create"
+                }),
+              }
+            ],
+            [
+              {
+                text: "Продажи",
+                callback_data: JSON.stringify({
+                    cmd: "call:sales"
+                })
+              },
+              {
+                text: "Спам",
+                callback_data: JSON.stringify({
+                    cmd: "call:spam"
+                }),
+              },
+            ],
+            [
+              {
+                text: "Выкуп",
+                callback_data: JSON.stringify({
+                    cmd: "call:payout"
+                }),
+              },
+              {
+                text: "Сервис",
+                callback_data: JSON.stringify({
+                    cmd: "call:service"
+                }),
+              },
+            ],
+          ],
+        },
+      });
+    }
   }
 
   /**
@@ -99,18 +168,14 @@ class CallsApp {
    *
    * @param {CallRequestDto} dto
    */
-  async sendSuccessChannelMessage(dto) {
-
-  }
+  async sendSuccessChannel(dto) {}
 
   /**
    * Sends missed calls to specified channel
    *
    * @param {CallRequestDto} dto
    */
-  async sendMissedChannelMessage(dto) {
-
-  }
+  async sendMissedChannel(dto) {}
 }
 
 export default CallsApp;

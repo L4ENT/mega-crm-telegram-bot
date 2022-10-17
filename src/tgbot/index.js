@@ -9,4 +9,7 @@ bot.setWebHook(`${config.PUBLIC_URL}/bot${config.BOT_TOKEN}`);
 
 bot.on("message", handlers.pingPong);
 
+bot.on("callback_query", handlers.callbakck);
+
+
 export default bot
