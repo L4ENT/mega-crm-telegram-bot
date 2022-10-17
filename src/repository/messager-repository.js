@@ -1,12 +1,12 @@
-import { BaseRepository } from "./base-repository.js";
+import { PrismaRepository } from "./prisma-repository.js";
 
-export default class MessagerRepository extends BaseRepository {
+export default class MessagerRepository extends PrismaRepository {
     constructor(prismaModel, messager) {
       super(prismaModel);
       this.messager = messager;
     }
   
-    async fingUnique(opts) {
+    async findUnique(opts) {
       return await this.prismaModel.findUnique({
         ...opts,
         where: {
@@ -14,7 +14,7 @@ export default class MessagerRepository extends BaseRepository {
         }
       })
     }
-    async fingMany(opts) {
+    async findMany(opts) {
       return await this.prismaModel.findMany({
         ...opts,
         where: {

@@ -1,4 +1,4 @@
-export class BaseRepository {
+export class PrismaRepository {
   /**
    * Handles every Telelegram Bot API event (WebHook)
    *
