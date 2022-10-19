@@ -1,6 +1,6 @@
-import prisma from '../../../prisma/client.js';
+import db from '../../../prisma/db.js';
 import bot from '../../tgbot/index.js';
-import CbqHandler from './handlers/CbqHandler.js';
+import CbqOrderCreateHandler from './handlers/CbqOrderCreateHandler.js';
 import MessageHandler from './handlers/MessageHandler.js';
 import simpleMessageMiddleware from './middlewares/simple-message.js'
 import Router from './Router.js';
@@ -8,7 +8,8 @@ import Router from './Router.js';
 const router = new Router()
 
 router.addMessageRoute(() => true, MessageHandler)
-router.addCbqRoute(() => true, CbqHandler)
+
+router.addCbqRoute((cbq) => JSON.parse(cbq.data)?.cmd === 'order:create', CbqOrderCreateHandler)
 
 class TelegramApp {
   constructor(){
@@ -19,7 +20,7 @@ class TelegramApp {
 
   async processUpdate(update){
     for(let mw of this.miidlewares) {
-      await mw(prisma, update)
+      await mw(db, update)
     }
     bot.processUpdate(update);
   }

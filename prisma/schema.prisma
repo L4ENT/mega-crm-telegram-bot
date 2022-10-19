@@ -12,6 +12,8 @@ datasource db {
 
 enum OrderStatuses {
   NEW
+  CANCELED
+  UNASSIGNED
   ASSIGNED
   DONE
 }
@@ -128,19 +130,22 @@ model MessagerChannelLabel {
 
 model Order {
   id              Int           @id @default(autoincrement())
-  clientName      String        @map("client_name")
-  date            DateTime
-  additionalPhone String        @map("additional_phone") @db.VarChar(64)
-  fullAddress     String        @map("full_address")
-  defect          String        @db.VarChar(128)
-  brand           String        @db.VarChar(128)
-  model           String        @db.VarChar(128)
-  deviceType      String        @map("device_type") @db.VarChar(128)
+  clientPhone     String        @map("client_phone") @db.VarChar(64)
+  clientName      String?       @map("client_name")
+  date            DateTime?
+  additionalPhone String?       @map("additional_phone") @db.VarChar(64)
+  fullAddress     String?       @map("full_address")
+  defect          String?       @db.VarChar(128)
+  brand           String?       @db.VarChar(128)
+  model           String?       @db.VarChar(128)
+  deviceTypeId    Int?          @map("device_type_id")
+  deviceType      DeviceType?   @relation(fields: [deviceTypeId], references: [id], onDelete: SetNull)
   status          OrderStatuses @default(NEW)
   createdAt       DateTime      @default(now()) @map("created_at") @db.Timestamptz(3)
   updatedAt       DateTime      @default(now()) @map("updated_at") @db.Timestamptz(3)
 
   messages OrderMessage[]
+  calls    Call[]
 
   @@map(name: "orders")
 }
@@ -160,4 +165,28 @@ model OrderMessage {
   messagerChats  MessagerChat? @relation(fields: [messagerChatId], references: [id], onDelete: SetNull)
 
   @@map(name: "order_messages")
+}
+
+model Call {
+  id          Int      @id @default(autoincrement())
+  callId      String   @unique @map("call_id") @db.VarChar(128)
+  clientPhone String   @map("client_phone") @db.VarChar(128)
+  date        DateTime
+  type        String   @db.VarChar(128)
+  status      String   @db.VarChar(128)
+  duration    Int      @default(0)
+  recordLink  String?  @map("record_link")
+
+  orderId Int?
+  order   Order? @relation(fields: [orderId], references: [id], onDelete: SetNull)
+
+  @@map(name: "calls")
+}
+
+model DeviceType {
+  id     Int     @id @default(autoincrement())
+  title  String  @db.VarChar(128)
+  orders Order[]
+
+  @@map(name: "device_types")
 }

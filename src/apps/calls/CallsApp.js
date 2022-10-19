@@ -1,3 +1,4 @@
+import db from "../../../prisma/db.js";
 import MessagerRepository from "../../repository/messager-repository.js";
 import bot from "../../tgbot/index.js";
 import ChannelLabels from "../telegram/enums/ChannelLabels.js";
@@ -7,15 +8,9 @@ import { callMessagerInlineKeyboard, formatCallMessage } from "./utils.js";
 
 
 class CallsApp {
-  /**
-   * Serves every TE API event
-   *
-   * @param {import('@prisma/client').Prisma} prisma
-   */
-  constructor(prisma, messager) {
-    this.prisma = prisma;
+  constructor(messager) {
     this.messagerChannelRepository = new MessagerRepository(
-      prisma.messagerChannel,
+      db.messagerChannel,
       messager
     );
   }
@@ -23,9 +18,26 @@ class CallsApp {
   /**
    * Serves every TE API event
    *
-   * @param {CallRequestDto} dto
+   * @param {import { CallRequestDto } from "./dto/CallRequestDto.js";} dto
    */
   async processRequest(dto) {
+
+    await db.call.upsert({
+      where: {
+        callId: dto.callId,
+      },
+      create: {
+        callId: dto.callId,
+        clientPhone: dto.clientPhone,
+        date: dto.timeStart,
+        duration: dto.duration,
+        recordLink: dto.recordLink,
+        type: dto.type,
+        status: dto.status
+      },
+      update: {}
+    })
+
     if (dto.type == CallTypes.OUT) {
       await this.sendOutCallChannel(dto);
     }
@@ -63,7 +75,7 @@ class CallsApp {
       await bot.sendMessage(channel.uid, message, {
         parse_mode: "HTML",
         reply_markup: {
-          inline_keyboard: callMessagerInlineKeyboard()
+          inline_keyboard: callMessagerInlineKeyboard(dto.callId)
         },
       });
     }

@@ -3,7 +3,9 @@ class BaseHandler {
         this.prisma = prisma
     }
 
-    async exec(some) {}
+    async exec(some) {
+        
+    }
 }
 
 export default BaseHandler

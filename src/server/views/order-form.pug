@@ -1,0 +1,111 @@
+doctype html
+html
+   head
+      title Заявка №#{order.id}
+   style(type="text/css").
+      .page-wrapper {
+         display: flex;
+         flex-direction: row;
+         justify-content: center;
+      }
+      .form-wrapper {
+         display: flex;
+         flex-direction: column;
+         padding: 2rem;
+         border: 1px solid #e9e9e9;
+         border-radius: 5px;
+         box-shadow: 0px 3px 11px #ddd;
+         min-width: 340px;
+      }
+      .form-wrapper form {
+         width: 100%;
+      }
+      .field-wrapper {
+         display: flex;
+         padding-top: 1rem;
+         width: 100%;
+      }
+      .field-wrapper label{
+         width: 100%;
+      }
+      .field-wrapper input {
+         border: 1px solid #c9c9c9;
+         padding: 1rem;
+         width: 100%;
+         border-radius: 5px;
+      }
+      .field-wrapper select {
+         border: 1px solid #c9c9c9;
+         padding: 1rem;
+         width: 100%;
+         border-radius: 5px;
+         outline:none;
+      }
+      .submit-wrapper {
+         display: flex;
+         flex-direction: row-reverse;
+         justify-content: space-between;
+         padding-top: 2rem;
+      }
+      .submit-wrapper button {
+         padding: 0.8rem 1.5rem;
+         border: 1px solid #58b3ff;
+         background: #5bb4ff;
+         color: white;
+         border-radius: 5px;
+      }
+   body
+      div.page-wrapper
+         div.form-wrapper
+            h2 Заявка №#{order.id} 
+            p Номер клиента:
+               a(href=`tel:+${order.clientPhone}`) +#{order.clientPhone} 
+            form(action=`/order-form?t=${order.id}`, method="post") 
+               div.field-wrapper
+                  input(
+                     name='clientName',
+                     placeholder='Имя клиента',
+                     value=order.clientName
+                  )
+               div.field-wrapper
+                  input(
+                     name='additionalPhone',
+                     placeholder='Дополнительный телефон',
+                     value=order.additionalPhone
+                  )
+               div.field-wrapper
+                  input(
+                     name='fullAddress',
+                     placeholder='Адрес',
+                     value=order.fullAddress
+                  )
+               div.field-wrapper
+                  input(
+                     name='defect',
+                     placeholder='Неисправность',
+                     value=order.defect
+                  )
+               div.field-wrapper
+                  input(
+                     name='brand',
+                     placeholder='Марка',
+                     value=order.brand
+                  )
+               div.field-wrapper
+                  input(
+                     name='model',
+                     placeholder='Модель',
+                     value=order.model
+                  )
+               div.field-wrapper
+                  select(
+                     name='deviceTypeId',
+                     placeholder='Тип устройства',
+                     value=order.deviceTypeId
+                  )
+                     each val in deviceTypes 
+                        option(value=val.id, selected=val.id === order.deviceTypeId) #{val.title} 
+               div.submit-wrapper
+                  if saved
+                     div.saved-alert Сохранено
+                  button(type="submit") Отправить

@@ -12,7 +12,6 @@ bot.on("message", (msg) => {
 });
 
 bot.on("callback_query", (cbq) => {
-    console.log('asdasd')
     const telegramApp = new TelegramApp()
     telegramApp.processCallbackQuery(cbq)
 });

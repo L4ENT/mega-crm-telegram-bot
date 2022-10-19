@@ -18,13 +18,14 @@ export function formatCallMessage(dto) {
   );
 }
 
-export function callMessagerInlineKeyboard() {
+export function callMessagerInlineKeyboard(callId) {
   return [
     [
       {
         text: "Заявка",
         callback_data: JSON.stringify({
           cmd: "order:create",
+          callId
         }),
       },
     ],
