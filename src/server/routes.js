@@ -4,6 +4,7 @@ import messagerModel from "../model/messager/messagerModel.js";
 import CallRequestDto from "../apps/calls/dto/CallRequestDto.js";
 import TelegramApp from "../apps/telegram/TelegramApp.js";
 import db from "../../prisma/db.js";
+import OrderApp from "../apps/orders/OrderApp.js";
 
 /**
  * Handles every Telephone exchange API event
@@ -41,9 +42,8 @@ export const callsEntry = async (req, res) => {
  * @param {import('express').Response} res - Number of times
  */
 export const tgBotWebHook = async (req, res) => {
-  const { prisma } = req.app;
 
-  const telegramApp = new TelegramApp(prisma);
+  const telegramApp = new TelegramApp();
 
   await telegramApp.processUpdate(req.body);
 
@@ -62,7 +62,17 @@ export const orderFormPage = async (req, res) => {
     return
   }
 
-  let order = await db.order.findUnique({ where: { id: parseInt(req.query.t) } });
+  let order = await db.order.findUnique({ 
+    where: { id: parseInt(req.query.t) },
+    include: {
+      deviceType: {
+        select: {
+          id: true,
+          title: true
+        }
+      }
+    }
+  });
   
   if(!order) {
     res.sendStatus(404)
@@ -83,8 +93,19 @@ export const orderFormPage = async (req, res) => {
         model: req.body.model,
         deviceTypeId: parseInt(req.body.deviceTypeId),
         date: !order.date ? moment().toDate(): undefined
+      },
+      include: {
+        deviceType: {
+          select: {
+            id: true,
+            title: true
+          }
+        }
       }
     })
+
+    const orderApp = new OrderApp()
+    await orderApp.syncOrderWithMessager(order)
   }
 
   const deviceTypes = await db.deviceType.findMany()

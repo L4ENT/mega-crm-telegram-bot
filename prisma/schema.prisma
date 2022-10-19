@@ -162,8 +162,9 @@ model OrderMessage {
   messagerChannel   MessagerChannel? @relation(fields: [messagerChannelId], references: [id], onDelete: SetNull)
 
   messagerChatId Int?          @map("messager_chat_id")
-  messagerChats  MessagerChat? @relation(fields: [messagerChatId], references: [id], onDelete: SetNull)
+  messagerChat  MessagerChat? @relation(fields: [messagerChatId], references: [id], onDelete: SetNull)
 
+  @@unique([orderId, chatUid, messageUid])
   @@map(name: "order_messages")
 }
 
