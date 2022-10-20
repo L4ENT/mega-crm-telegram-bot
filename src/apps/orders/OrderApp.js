@@ -2,6 +2,7 @@ import db from "../../../prisma/db.js";
 import MessagerRepository from "../../repository/messager-repository.js";
 import bot from "../../tgbot/index.js";
 import ChannelLabels from "../telegram/enums/ChannelLabels.js";
+import { getTelegramMessager } from "../telegram/utils.js";
 import { dispatcherOrderInlineKB, orderMessageForDispatcher } from "./utils.js";
 
 class OrderApp {
@@ -17,7 +18,7 @@ class OrderApp {
       await this.editOrderDispatcherMessage(chatUid, messageUid, order);
     }
 
-    const messager = db.messager.findUnique({ where: { code: "telegram" } });
+    const messager = await getTelegramMessager()
     const channels = new MessagerRepository(db.messagerChannel, messager);
     const dispatcherChannels = await channels.findMany({
       where: {

@@ -9,13 +9,10 @@ const __filename = fileURLToPath(import.meta.url);
 
 const __dirname = path.dirname(__filename);
 
-const prisma = new PrismaClient()
-
 const server = express();
  
 server.set('view engine', 'pug');
 server.set('views', path.join(__dirname, 'views'));
-console.log(path.join(__dirname, 'views'))
 
 server.use('/api', json());
 server.use(`/bot${config.BOT_TOKEN}`, json());

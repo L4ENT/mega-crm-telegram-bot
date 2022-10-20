@@ -1,9 +1,9 @@
 class BaseHandler {
-    constructor(prisma) {
-        this.prisma = prisma
+    constructor(flow) {
+        this.flow = flow ? flow : null
     }
 
-    async exec(some) {
+    async exec() {
         
     }
 }

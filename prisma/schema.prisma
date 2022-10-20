@@ -36,6 +36,7 @@ model Messager {
   messagerChannels MessagerChannel[]
   messagerLabels   MessagerLabel[]
   messagerChats    MessagerChat[]
+  messagerFlows    MessagerFlow[]
 
   @@map(name: "messagers")
 }
@@ -56,6 +57,22 @@ model MessagerUser {
 
   @@unique([uid, messagerId])
   @@map(name: "messager_users")
+}
+
+model MessagerFlow {
+  id Int @id @default(autoincrement())
+
+  messagerId Int      @map("messager_id")
+  messager   Messager @relation(fields: [messagerId], references: [id], onDelete: SetNull)
+
+  userUid String @db.VarChar(256)
+  chatUid String @db.VarChar(256)
+
+  active Boolean @default(false)
+  data   String
+
+  @@unique([userUid, chatUid])
+  @@map("messager_flows")
 }
 
 model MessagerChat {
@@ -162,7 +179,7 @@ model OrderMessage {
   messagerChannel   MessagerChannel? @relation(fields: [messagerChannelId], references: [id], onDelete: SetNull)
 
   messagerChatId Int?          @map("messager_chat_id")
-  messagerChat  MessagerChat? @relation(fields: [messagerChatId], references: [id], onDelete: SetNull)
+  messagerChat   MessagerChat? @relation(fields: [messagerChatId], references: [id], onDelete: SetNull)
 
   @@unique([orderId, chatUid, messageUid])
   @@map(name: "order_messages")

@@ -1,4 +1,3 @@
-import db from "../../../prisma/db.js";
 import bot from "../../tgbot/index.js";
 
 class Router {
@@ -15,11 +14,11 @@ class Router {
     this.callbackQueryRoutes.push([condition, Handler]);
   }
 
-  async serveMessage(msg) {
+  async serveMessage(msg, flow) {
     const handlers = [];
     for (let [condition, Handler] of this.messageRoutes) {
-      if (condition(msg)) {
-        handlers.push(new Handler(db));
+      if (condition(msg, flow)) {
+        handlers.push(new Handler(flow));
       }
     }
 
@@ -28,11 +27,11 @@ class Router {
     }
   }
 
-  async serveCallbackQuery(cbq) {
+  async serveCallbackQuery(cbq, flow) {
     const handlers = [];
     for (let [condition, Handler] of this.callbackQueryRoutes) {
-      if (condition(cbq)) {
-        handlers.push(new Handler(db));
+      if (condition(cbq, flow)) {
+        handlers.push(new Handler(flow));
       }
     }
 
