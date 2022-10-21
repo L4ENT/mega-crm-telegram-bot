@@ -12,5 +12,6 @@ export default class TeEvents {
         console.log('TeAgent.onNewCall', {
             dto
         })
+        throw Error("Not implemented")
     }
 }

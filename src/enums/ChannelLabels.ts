@@ -1,0 +1,11 @@
+const ChannelLabels = {
+    CALLS_OUTCOMING: "CALLS_OUTCOMING",
+    CALLS_SALES: "CALLS_SALES",
+    CALLS_SPAM: "CALLS_SPAM",
+    CALLS_PAYOUT: "CALLS_PAYOUT",
+    CALLS_SERVICE: "CALLS_SERVICE",
+    DISPATCHER: "DISPATCHER",
+    MASTER: "MASTER",
+}
+
+export default ChannelLabels

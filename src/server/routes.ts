@@ -1,5 +1,5 @@
 import moment = require("moment");
-import db from "../../prisma/db";
+import db from "../db";
 import CallsApp from "../apps/calls/CallsApp";
 import CallRequestDto from "../apps/calls/dto/CallRequestDto";
 import OrderApp from "../apps/orders/OrderApp";

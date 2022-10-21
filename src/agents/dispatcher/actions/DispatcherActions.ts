@@ -11,10 +11,14 @@ export default class DispatcherActions implements AgentActionsInterface {
   }
 
   async searchForOrderMaster(order: Order, query: string) {
+    // The bot will send keyboard with buttons (each button user option)  
     await this.agent.bot.events.onOrderMasterSearch(order, this.agent, query);
   }
 
   async assignOrderToMaster(order: Order, master: MasterAgent) {
+    // Set order master
     await master.events.onOrderAssign(order)
+    // Notify bot about it
+    await this.agent.bot.events.onOrderMasterAssign(order, master)
   }
 }

@@ -1,4 +1,4 @@
-import db from "../../../../prisma/db";
+import db from "../../../db";
 import bot from "../../../tgbot/index";
 import BaseHandler from "./BaseHandler";
 

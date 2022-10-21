@@ -5,7 +5,7 @@
   "compilerOptions": {
     "baseUrl": "./src",
     "paths": {
-      "@src/*": [ "*"]
+      "@src/*": [ "*"],
     },
     "outDir": "./built",
     "allowJs": true,

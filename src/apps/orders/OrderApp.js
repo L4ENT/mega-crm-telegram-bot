@@ -1,7 +1,7 @@
-import db from "../../../prisma/db";
+import db from "../../db";
 import MessagerRepository from "../../repository/messager-repository";
 import bot from "../../tgbot/index";
-import ChannelLabels from "../telegram/enums/ChannelLabels";
+import ChannelLabels from "../../enums/ChannelLabels";
 import { getTelegramMessager } from "../telegram/utils";
 import {
   dispatcherOrderInlineKB,

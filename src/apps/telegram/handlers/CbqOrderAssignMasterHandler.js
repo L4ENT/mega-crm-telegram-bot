@@ -1,4 +1,4 @@
-import db from "../../../../prisma/db";
+import db from "../../../db";
 import OrderApp from "../../orders/OrderApp";
 import { getTelegramMessager } from "../utils";
 import CbqHandler from "./CbqHandler";

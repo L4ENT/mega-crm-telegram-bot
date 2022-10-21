@@ -1,4 +1,4 @@
-import db from "../../../../prisma/db";
+import db from "../../../db";
 import bot from "../../../tgbot/index";
 import { orderFormLink } from "../../orders/utils";
 import CbqHandler from "./CbqHandler";

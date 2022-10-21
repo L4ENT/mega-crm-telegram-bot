@@ -7,4 +7,8 @@ export default class MasterActions implements AgentActionsInterface {
     constructor(agent: MasterAgent) {
         this.agent = agent
     }
+
+    async finishOrder(){
+        throw Error("Not implemented")
+    }
 }

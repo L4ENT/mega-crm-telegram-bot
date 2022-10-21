@@ -1,4 +1,4 @@
-import db from "../../../../prisma/db";
+import db from "../../../db";
 import MessagerRepository from "../../../repository/messager-repository";
 import { getTelegramMessager } from "../utils";
 

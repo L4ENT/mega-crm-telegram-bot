@@ -10,7 +10,8 @@ class MasterEvents implements AgentEventsInterface{
   }
 
   async onOrderAssign(order: Order) {
-
+    //TODO: Set order.master
+    throw Error("Not implemented")
   }
 }
 
