@@ -1,10 +1,10 @@
-import moment from "moment";
-import CallsApp from "../apps/calls/CallsApp.js";
-import messagerModel from "../model/messager/messagerModel.js";
-import CallRequestDto from "../apps/calls/dto/CallRequestDto.js";
-import TelegramApp from "../apps/telegram/TelegramApp.js";
-import db from "../../prisma/db.js";
-import OrderApp from "../apps/orders/OrderApp.js";
+import moment = require("moment");
+import db from "../../prisma/db";
+import CallsApp from "../apps/calls/CallsApp";
+import CallRequestDto from "../apps/calls/dto/CallRequestDto";
+import OrderApp from "../apps/orders/OrderApp";
+import TelegramApp from "../apps/telegram/TelegramApp";
+import { getTelegramMessager } from "../apps/telegram/utils";
 
 /**
  * Handles every Telephone exchange API event
@@ -12,13 +12,10 @@ import OrderApp from "../apps/orders/OrderApp.js";
  * @param {import('express').Request} req - The text to repeat
  * @param {import('express').Response} res - Number of times
  */
-export const callsEntry = async (req, res) => {
-  const {
-    app: { prisma },
-    body,
-  } = req;
+export const callsEntry = async (req: import('express').Request, res: import('express').Response) => {
+  const { body } = req;
 
-  const messager = await messagerModel.getUnique(prisma, { code: "telegram" });
+  const messager = await getTelegramMessager();
 
   const dto = new CallRequestDto(
     body.type.toUpperCase(),
@@ -29,7 +26,7 @@ export const callsEntry = async (req, res) => {
     body.callid,
     body.link
   );
-  const callsApp = new CallsApp(prisma, messager);
+  const callsApp = new CallsApp(messager);
   const result = callsApp.processRequest(dto);
 
   res.status(200).json(result);
@@ -41,7 +38,7 @@ export const callsEntry = async (req, res) => {
  * @param {import('express').Request} req - The text to repeat
  * @param {import('express').Response} res - Number of times
  */
-export const tgBotWebHook = async (req, res) => {
+export const tgBotWebHook = async (req: import('express').Request, res: import('express').Response) => {
 
   const telegramApp = new TelegramApp();
 
@@ -56,14 +53,14 @@ export const tgBotWebHook = async (req, res) => {
  * @param {import('express').Request} req - The text to repeat
  * @param {import('express').Response} res - Number of times
  */
-export const orderFormPage = async (req, res) => {
-  if(!parseInt(req.query.t)) {
+export const orderFormPage = async (req: import('express').Request, res: import('express').Response) => {
+  if(!parseInt(req.query.t.toString())) {
     res.sendStatus(404)
     return
   }
 
   let order = await db.order.findUnique({ 
-    where: { id: parseInt(req.query.t) },
+    where: { id: parseInt(req.query.t.toString()) },
     include: {
       deviceType: {
         select: {
@@ -100,7 +97,8 @@ export const orderFormPage = async (req, res) => {
             id: true,
             title: true
           }
-        }
+        },
+        master: true
       }
     })
 

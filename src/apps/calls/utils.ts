@@ -1,12 +1,8 @@
-import moment from "moment";
-import CallTypes from "./enums/CallTypes.js";
+import * as moment from 'moment'
+import CallRequestDto from './dto/CallRequestDto';
+import CallTypes from "./enums/CallTypes";
 
-/**
- * Sends all out-calls to specified channel
- *
- * @param {CallRequestDto} dto
- */
-export function formatCallMessage(dto) {
+export function formatCallMessage(dto: CallRequestDto) {
   return (
     `${dto.type === CallTypes.IN ? "Входящий" : "Исходящий"} звонок\n\n` +
     `<b>Поступил</b>: ${moment(dto.timeStart).format(

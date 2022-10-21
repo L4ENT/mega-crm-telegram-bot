@@ -1,4 +1,4 @@
-import db from "../../../prisma/db.js";
+import db from "../../../prisma/db";
 
 export async function getTelegramMessager() {
   return await db.messager.findUnique({ where: { code: "telegram" } });
@@ -23,7 +23,7 @@ export async function getFlowFromMessage(msg) {
 }
 
 export async function getFlowFromCbq(cbq) {
-  const dbFlow = db.messagerFlow.findUnique({
+  const dbFlow = await db.messagerFlow.findUnique({
     where: {
       userUid_chatUid: {
         userUid: cbq.message.from.id.toString(),
@@ -33,7 +33,6 @@ export async function getFlowFromCbq(cbq) {
   });
 
   if (!dbFlow) return null;
-
   return {
     ...dbFlow,
     data: JSON.parse(dbFlow.data),

@@ -1,4 +1,4 @@
-import BaseHandler from './BaseHandler.js' 
+import BaseHandler from './BaseHandler' 
 
 class CbqHandler extends BaseHandler {
     async exec(cbq){}

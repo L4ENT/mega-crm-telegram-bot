@@ -1,9 +1,13 @@
-import db from "../../../prisma/db.js";
-import MessagerRepository from "../../repository/messager-repository.js";
-import bot from "../../tgbot/index.js";
-import ChannelLabels from "../telegram/enums/ChannelLabels.js";
-import { getTelegramMessager } from "../telegram/utils.js";
-import { dispatcherOrderInlineKB, orderMessageForDispatcher } from "./utils.js";
+import db from "../../../prisma/db";
+import MessagerRepository from "../../repository/messager-repository";
+import bot from "../../tgbot/index";
+import ChannelLabels from "../telegram/enums/ChannelLabels";
+import { getTelegramMessager } from "../telegram/utils";
+import {
+  dispatcherOrderInlineKB,
+  orderMessageForDispatcher,
+  orderMessageForMaster,
+} from "./utils";
 
 class OrderApp {
   async syncOrderWithMessager(order) {
@@ -18,7 +22,7 @@ class OrderApp {
       await this.editOrderDispatcherMessage(chatUid, messageUid, order);
     }
 
-    const messager = await getTelegramMessager()
+    const messager = await getTelegramMessager();
     const channels = new MessagerRepository(db.messagerChannel, messager);
     const dispatcherChannels = await channels.findMany({
       where: {
@@ -30,8 +34,65 @@ class OrderApp {
       },
     });
     for (let ch of dispatcherChannels) {
-      if (!excludesChatsForSend.includes(ch.uid)){
+      if (!excludesChatsForSend.includes(ch.uid)) {
         this.sendOrderDispatcherMessage(ch.uid, order);
+      }
+    }
+
+    if (order.masterId) {
+      // TODO удалить сообщение у всех остальных
+
+      const masterOrderMessages = await db.orderMessage.findMany({
+        where: {
+          messagerChannel: {
+            labels: {
+              some: {
+                messagerlabelCode: ChannelLabels.MASTER,
+              },
+            },
+          },
+        },
+      });
+
+      const masterChannels = await channels.findMany({
+        where: {
+          messagerUsers: {
+            some: {
+              messagerUser: {
+                userId: order.masterId,
+              },
+            },
+          },
+          labels: {
+            some: {
+              messagerlabelCode: ChannelLabels.MASTER,
+            },
+          },
+        },
+      });
+
+      const masterChannelsUids = masterChannels.map((x) => x.uid);
+
+      for (let orderMessage of masterOrderMessages) {
+        if (!masterChannelsUids.includes(orderMessage.chatUid)) {
+          try {
+            console.log('orderMessage', orderMessage)
+            await bot.deleteMessage(
+              orderMessage.chatUid,
+              orderMessage.messageUid
+            );
+            db.orderMessage.delete({
+              where: {
+                orderId: order.id,
+                chatUid: orderMessage.chatUid,
+                messageUid: orderMessage.messageUid
+              }
+            })
+          } catch (err) {
+            console.log('Error')
+          }
+          
+        }
       }
     }
   }
@@ -60,12 +121,22 @@ class OrderApp {
           inline_keyboard: dispatcherOrderInlineKB(order),
         },
       });
-    } catch {
+    } catch (err) {
       console.log("Same message content");
     }
   }
 
   async saveOrderMessage(orderId, chatUid, messageUid) {
+    const messager = await getTelegramMessager();
+
+    const channel = await db.messagerChannel.findUnique({
+      where: {
+        uid_messagerId: {
+          uid: chatUid.toString(),
+          messagerId: messager.id,
+        },
+      },
+    });
     await db.orderMessage.upsert({
       where: {
         orderId_chatUid_messageUid: {
@@ -78,9 +149,61 @@ class OrderApp {
         orderId: orderId,
         chatUid: chatUid.toString(),
         messageUid: messageUid.toString(),
+        messagerChannelId: channel ? channel.id : undefined,
       },
-      update: {},
+      update: {
+        messagerChannelId: channel ? channel.id : undefined,
+      },
     });
+  }
+
+  async assignMaster(orderId, userId) {
+    return await db.order.update({
+      where: {
+        id: orderId,
+      },
+      data: {
+        masterId: userId,
+      },
+      include: {
+        deviceType: true,
+        master: true,
+      },
+    });
+  }
+
+  async sendOrderMessageToMaster(order, userId) {
+    const messager = await getTelegramMessager();
+    const channels = new MessagerRepository(db.messagerChannel, messager);
+
+    const masterChannles = await channels.findMany({
+      where: {
+        labels: {
+          some: {
+            messagerlabelCode: ChannelLabels.MASTER,
+          },
+        },
+        messagerUsers: {
+          some: {
+            messagerUser: {
+              userId,
+            },
+          },
+        },
+      },
+    });
+
+    for (let channel of masterChannles) {
+      const message = await bot.sendMessage(
+        channel.uid,
+        orderMessageForMaster(order),
+        {
+          parse_mode: "HTML",
+        }
+      );
+
+      await this.saveOrderMessage(order.id, channel.uid, message.message_id);
+    }
   }
 }
 

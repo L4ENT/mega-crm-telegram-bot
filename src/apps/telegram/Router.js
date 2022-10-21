@@ -1,4 +1,4 @@
-import bot from "../../tgbot/index.js";
+import bot from "../../tgbot/index";
 
 class Router {
   constructor() {

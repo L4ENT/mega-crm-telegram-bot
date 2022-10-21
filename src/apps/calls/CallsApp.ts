@@ -1,14 +1,17 @@
-import db from "../../../prisma/db.js";
-import MessagerRepository from "../../repository/messager-repository.js";
-import bot from "../../tgbot/index.js";
-import ChannelLabels from "../telegram/enums/ChannelLabels.js";
-import CallStatuses from "./enums/CallStatuses.js";
-import CallTypes from "./enums/CallTypes.js";
-import { callMessagerInlineKeyboard, formatCallMessage } from "./utils.js";
+import { Messager } from "@prisma/client";
+import db from "../../../prisma/db";
+import MessagerRepository from "../../repository/messager-repository";
+import bot from "../../tgbot/index";
+import ChannelLabels from "../telegram/enums/ChannelLabels";
+import CallStatuses from "./enums/CallStatuses";
+import CallTypes from "./enums/CallTypes";
+import { callMessagerInlineKeyboard, formatCallMessage } from "./utils";
 
 
 class CallsApp {
-  constructor(messager) {
+  messagerChannelRepository: MessagerRepository;
+
+  constructor(messager: Messager) {
     this.messagerChannelRepository = new MessagerRepository(
       db.messagerChannel,
       messager
@@ -18,7 +21,7 @@ class CallsApp {
   /**
    * Serves every TE API event
    *
-   * @param {import { CallRequestDto } from "./dto/CallRequestDto.js";} dto
+   * @param {import { CallRequestDto } from "./dto/CallRequestDto";} dto
    */
   async processRequest(dto) {
 

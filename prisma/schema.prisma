@@ -21,8 +21,10 @@ enum OrderStatuses {
 model User {
   id       Int     @id @default(autoincrement())
   username String?
+  fullName String? @map("full_name")
 
   messagerUsers MessagerUser[]
+  orders        Order[]
 
   @@map(name: "users")
 }
@@ -101,9 +103,9 @@ model MessagerChannel {
   name String?
   uid  String  @db.VarChar(256)
 
-  messager_users MessagerUserChannel[]
-  labels         MessagerChannelLabel[]
-  orderMessages  OrderMessage[]
+  messagerUsers MessagerUserChannel[]
+  labels        MessagerChannelLabel[]
+  orderMessages OrderMessage[]
 
   @@unique([uid, messagerId])
   @@map(name: "messager_channels")
@@ -160,6 +162,9 @@ model Order {
   status          OrderStatuses @default(NEW)
   createdAt       DateTime      @default(now()) @map("created_at") @db.Timestamptz(3)
   updatedAt       DateTime      @default(now()) @map("updated_at") @db.Timestamptz(3)
+
+  masterId Int?  @map("master_id")
+  master   User? @relation(fields: [masterId], references: [id], onDelete: SetNull)
 
   messages OrderMessage[]
   calls    Call[]

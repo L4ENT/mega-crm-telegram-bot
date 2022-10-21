@@ -1,9 +1,9 @@
 import db from "../../../../prisma/db";
-import bot from "../../../tgbot/index";
+import OrderApp from "../../orders/OrderApp";
 import { getTelegramMessager } from "../utils";
 import CbqHandler from "./CbqHandler";
 
-class CbqOrderSetMasterHandler extends CbqHandler {
+class CbqOrderAssignMasterHandler extends CbqHandler {
   async startFlow(orderId, userUid, chatUid) {
     const messager = await getTelegramMessager()
     await db.messagerFlow.upsert({
@@ -20,7 +20,9 @@ class CbqOrderSetMasterHandler extends CbqHandler {
         active: true,
         data: JSON.stringify({
           code: "flow:order:setmaster",
-          orderId
+          data: {
+            orderId,
+          },
         }),
       },
       update: {
@@ -28,7 +30,9 @@ class CbqOrderSetMasterHandler extends CbqHandler {
         messagerId: messager.id,
         data: JSON.stringify({
           code: "flow:order:setmaster",
-          orderId
+          data: {
+            orderId,
+          },
         }),
       },
     });
@@ -36,31 +40,14 @@ class CbqOrderSetMasterHandler extends CbqHandler {
   async exec(cbq) {
     const cbqData = JSON.parse(cbq.data);
 
-    await this.startFlow(
-      cbqData.orderId,
-      cbq.from.id,
-      cbq.message.chat.id
-    );
+    const orderApp = new OrderApp()
 
-    await bot.sendMessage(
-      cbq.message.chat.id,
-      "Пожалуйста введите имя или фамилию мастера",
-      {
-        reply_markup: {
-          inline_keyboard: [
-            [
-              {
-                text: "Выйти",
-                callback_data: JSON.stringify({
-                  cmd: "flow:exit",
-                }),
-              },
-            ],
-          ],
-        },
-      }
-    );
+    const order = await orderApp.assignMaster(cbqData.orderId, cbqData.userId)
+
+    await orderApp.sendOrderMessageToMaster(order, order.masterId)
+
+    await orderApp.syncOrderWithMessager(order)
   }
 }
 
-export default CbqOrderSetMasterHandler;
+export default CbqOrderAssignMasterHandler;

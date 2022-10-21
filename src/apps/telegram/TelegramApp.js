@@ -1,17 +1,20 @@
-import bot from '../../tgbot/index.js';
-import CbqOrderCreateHandler from './handlers/CbqOrderCreateHandler.js';
-import CbqOrderSetMasterHandler from './handlers/CbqOrderSetMasterHandler.js';
-import MessageHandler from './handlers/MessageHandler.js';
-import simpleMessageMiddleware from './middlewares/simple-message.js'
-import Router from './Router.js';
-import { getFlowFromCbq, getFlowFromMessage } from './utils.js';
+import bot from '../../tgbot/index';
+import CbqOrderAssignMasterHandler from './handlers/CbqOrderAssignMasterHandler';
+import CbqOrderCreateHandler from './handlers/CbqOrderCreateHandler';
+import CbqOrderSetMasterHandler from './handlers/CbqOrderSetMasterHandler';
+import SearchMasterHandler from './handlers/SearchMasterHandler';
+import simpleMessageMiddleware from './middlewares/simple-message'
+import Router from './Router';
+import { getFlowFromCbq, getFlowFromMessage } from './utils';
 
 const router = new Router()
 
-router.addMessageRoute((msg, flow) => flow.data.code === "flow:order:setmaster", MessageHandler)
+router.addMessageRoute((msg, flow) => flow?.data?.code === "flow:order:setmaster", SearchMasterHandler)
 
 router.addCbqRoute((cbq) => JSON.parse(cbq.data)?.cmd === 'order:create', CbqOrderCreateHandler)
 router.addCbqRoute((cbq) => JSON.parse(cbq.data)?.cmd === 'order:setmaster', CbqOrderSetMasterHandler)
+router.addCbqRoute((cbq) => JSON.parse(cbq.data)?.cmd === 'order:assignmaster', CbqOrderAssignMasterHandler)
+router.addCbqRoute((cbq) => JSON.parse(cbq.data)?.cmd === 'order:changemaster', CbqOrderSetMasterHandler)
 
 class TelegramApp {
   constructor(){

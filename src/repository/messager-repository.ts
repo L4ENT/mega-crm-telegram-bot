@@ -1,7 +1,10 @@
-import { PrismaRepository } from "./prisma-repository.js";
+import { PrismaRepository } from "./prisma-repository";
 
 export default class MessagerRepository extends PrismaRepository {
-    constructor(prismaModel, messager) {
+    
+    messager: any
+
+    constructor(prismaModel: any, messager: any) {
       super(prismaModel);
       this.messager = messager;
     }

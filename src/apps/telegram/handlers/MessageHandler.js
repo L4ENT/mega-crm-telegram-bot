@@ -1,5 +1,5 @@
-import bot from '../../../tgbot/index.js'
-import BaseHandler from './BaseHandler.js' 
+import bot from '../../../tgbot/index'
+import BaseHandler from './BaseHandler' 
 
 class MessageHandler extends BaseHandler {
     async exec(msg){

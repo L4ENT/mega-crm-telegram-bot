@@ -1,7 +1,7 @@
-import db from "../../../../prisma/db.js";
-import bot from "../../../tgbot/index.js";
-import { orderFormLink } from "../../orders/utils.js";
-import CbqHandler from "./CbqHandler.js";
+import db from "../../../../prisma/db";
+import bot from "../../../tgbot/index";
+import { orderFormLink } from "../../orders/utils";
+import CbqHandler from "./CbqHandler";
 
 class CbqOrderCreateHandler extends CbqHandler {
   async createOrder(callId) {

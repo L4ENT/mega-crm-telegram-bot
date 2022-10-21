@@ -1,12 +1,13 @@
-import db from "../../../../prisma/db.js";
-import MessagerRepository from "../../../repository/messager-repository.js";
-import { getTelegramMessager } from "../utils.js";
+import db from "../../../../prisma/db";
+import MessagerRepository from "../../../repository/messager-repository";
+import { getTelegramMessager } from "../utils";
 
 
 async function simpleMessageMiddleware(update) {
+  console.log(update)
   const { tgUser, tgChannel, tgChat } = {
     tgUser: update?.message?.from,
-    tgChannel: update?.message?.chat?.type == "group" ? update.message.chat : null,
+    tgChannel: ["group", "supergroup"].includes(update?.message?.chat?.type) ? update.message.chat : null,
     tgChat: update?.message?.chat?.type == "private" ? update.message.chat : null,
   };
   
@@ -67,11 +68,16 @@ async function simpleMessageMiddleware(update) {
       },
       data: {
         channels: {
-          connect: {
-            messagerUserId_messagerChannelId: {
-              messagerUserId: mUser.id,
-              messagerChannelId: mChannel.id,
+          connectOrCreate: {
+            where: {
+              messagerUserId_messagerChannelId: {
+                messagerUserId: mUser.id,
+                messagerChannelId: mChannel.id,
+              },
             },
+            create: {
+              messagerChannelId: mChannel.id,
+            }
           },
         },
       },
