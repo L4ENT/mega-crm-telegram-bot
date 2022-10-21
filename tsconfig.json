@@ -1,10 +1,19 @@
 {
-    "exclude": [ "node_modules" ],
-    "compilerOptions": {
-      "outDir": "./built",
-      "allowJs": true,
-      "target": "ES5",
-      "module": "CommonJS"
+  "exclude": [
+    "node_modules"
+  ],
+  "compilerOptions": {
+    "baseUrl": "./src",
+    "paths": {
+      "@src/*": [ "*"]
     },
-    "include": ["./**/*.ts", "index.ts"]
+    "outDir": "./built",
+    "allowJs": true,
+    "target": "ES6",
+    "module": "CommonJS"
+  },
+  "include": [
+    "./**/*.ts",
+    "index.ts"
+  ]
 }

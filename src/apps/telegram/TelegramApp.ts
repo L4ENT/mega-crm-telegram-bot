@@ -1,4 +1,4 @@
-import bot from '../../tgbot/index';
+import bot from '@src/tgbot';
 import CbqOrderAssignMasterHandler from './handlers/CbqOrderAssignMasterHandler';
 import CbqOrderCreateHandler from './handlers/CbqOrderCreateHandler';
 import CbqOrderSetMasterHandler from './handlers/CbqOrderSetMasterHandler';
@@ -17,6 +17,7 @@ router.addCbqRoute((cbq) => JSON.parse(cbq.data)?.cmd === 'order:assignmaster', 
 router.addCbqRoute((cbq) => JSON.parse(cbq.data)?.cmd === 'order:changemaster', CbqOrderSetMasterHandler)
 
 class TelegramApp {
+  miidlewares: ((update: any) => Promise<any>)[];
   constructor(){
     this.miidlewares = [
       simpleMessageMiddleware

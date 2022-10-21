@@ -1,6 +1,9 @@
 import bot from "../../tgbot/index";
 
 class Router {
+  messageRoutes: any[];
+  callbackQueryRoutes: any[];
+  
   constructor() {
     this.messageRoutes = [];
     this.callbackQueryRoutes = [];
