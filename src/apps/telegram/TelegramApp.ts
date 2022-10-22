@@ -1,45 +1,59 @@
-import bot from '@src/tgbot';
-import CbqOrderAssignMasterHandler from './handlers/CbqOrderAssignMasterHandler';
-import CbqOrderCreateHandler from './handlers/CbqOrderCreateHandler';
-import CbqOrderSetMasterHandler from './handlers/CbqOrderSetMasterHandler';
-import SearchMasterHandler from './handlers/SearchMasterHandler';
-import simpleMessageMiddleware from './middlewares/simple-message'
-import Router from './Router';
-import { getFlowFromCbq, getFlowFromMessage } from './utils';
+import bot from "@src/tgbot";
+import { CallbackQuery, Message, Update } from "node-telegram-bot-api";
+import CbqOrderAssignMasterHandler from "./handlers/CbqOrderAssignMasterHandler";
+import CbqOrderCreateHandler from "./handlers/CbqOrderCreateHandler";
+import CbqOrderSetMasterHandler from "./handlers/CbqOrderSetMasterHandler";
+import SearchMasterHandler from "./handlers/SearchMasterHandler";
+import simpleMessageMiddleware from "./middlewares/simple-message";
+import Router from "./Router";
+import { getFlowFromCbq, getFlowFromMessage } from "./utils";
 
-const router = new Router()
+const router = new Router();
 
-router.addMessageRoute((msg, flow) => flow?.data?.code === "flow:order:setmaster", SearchMasterHandler)
+router.addMessageRoute(
+  (msg: Message, flow: any) => flow?.data?.code === "flow:order:setmaster",
+  SearchMasterHandler
+);
 
-router.addCbqRoute((cbq) => JSON.parse(cbq.data)?.cmd === 'order:create', CbqOrderCreateHandler)
-router.addCbqRoute((cbq) => JSON.parse(cbq.data)?.cmd === 'order:setmaster', CbqOrderSetMasterHandler)
-router.addCbqRoute((cbq) => JSON.parse(cbq.data)?.cmd === 'order:assignmaster', CbqOrderAssignMasterHandler)
-router.addCbqRoute((cbq) => JSON.parse(cbq.data)?.cmd === 'order:changemaster', CbqOrderSetMasterHandler)
+router.addCbqRoute(
+  (cbq: CallbackQuery) => JSON.parse(cbq.data)?.cmd === "order:create",
+  CbqOrderCreateHandler
+);
+router.addCbqRoute(
+  (cbq: CallbackQuery) => JSON.parse(cbq.data)?.cmd === "order:setmaster",
+  CbqOrderSetMasterHandler
+);
+router.addCbqRoute(
+  (cbq: CallbackQuery) => JSON.parse(cbq.data)?.cmd === "order:assignmaster",
+  CbqOrderAssignMasterHandler
+);
+router.addCbqRoute(
+  (cbq: CallbackQuery) => JSON.parse(cbq.data)?.cmd === "order:changemaster",
+  CbqOrderSetMasterHandler
+);
 
 class TelegramApp {
   miidlewares: ((update: any) => Promise<any>)[];
-  constructor(){
-    this.miidlewares = [
-      simpleMessageMiddleware
-    ]
+  constructor() {
+    this.miidlewares = [simpleMessageMiddleware];
   }
 
-  async processUpdate(update){
-    for(let mw of this.miidlewares) {
-      await mw(update)
+  async processUpdate(update: Update) {
+    for (let mw of this.miidlewares) {
+      await mw(update);
     }
     bot.processUpdate(update);
   }
 
-  async processMessage(msg){
-    let flow = await getFlowFromMessage(msg)
-    await router.serveMessage(msg, flow)
+  async processMessage(msg: Message) {
+    let flow = await getFlowFromMessage(msg);
+    await router.serveMessage(msg, flow);
   }
 
-  async processCallbackQuery(cbq){
-    const flow = await getFlowFromCbq(cbq)
-    await router.serveCallbackQuery(cbq, flow)
+  async processCallbackQuery(cbq: CallbackQuery) {
+    const flow = await getFlowFromCbq(cbq);
+    await router.serveCallbackQuery(cbq, flow);
   }
 }
 
-export default TelegramApp
+export default TelegramApp;

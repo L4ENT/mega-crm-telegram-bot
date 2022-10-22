@@ -1,5 +1,7 @@
+import { Call } from "@prisma/client";
 import TeAgent from "@src/agents/te/TeAgent";
 import CallDto from "@src/dto/CallDto";
+import CallManager from "@src/managers/CallManager";
 
 export default class TeEvents {
     agent: TeAgent;
@@ -9,9 +11,7 @@ export default class TeEvents {
     }
 
     async onNewCall(dto: CallDto) {
-        console.log('TeAgent.onNewCall', {
-            dto
-        })
-        throw Error("Not implemented")
+        const call: Call = await CallManager.createCall(dto)
+        await this.agent.bot.events.onNewCall(call)
     }
 }

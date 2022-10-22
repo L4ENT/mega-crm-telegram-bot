@@ -21,26 +21,26 @@ class BotEvents implements AgentEventsInterface {
 
   async onCallIdent(call: Call, callIdenty: string) {
     if (callIdenty === CallIdenties.ORDER) {
-      await this.agent.actions.sendDispatcherCallMessage(call);
+      await this.agent.actions.sendOutCallMessage(call);
     } else {
       let chatIds = [];
       if (callIdenty === CallIdenties.SALES) {
-        chatIds = await this.agent.messagerEngine.getChatsByLabel(
+        chatIds = await this.agent.messagerEngine.getChannelIdsByLabel(
           ChannelLabels.CALLS_SALES
         );
       }
       if (callIdenty === CallIdenties.SPAM) {
-        chatIds = await this.agent.messagerEngine.getChatsByLabel(
+        chatIds = await this.agent.messagerEngine.getChannelIdsByLabel(
           ChannelLabels.CALLS_SPAM
         );
       }
       if (callIdenty === CallIdenties.PAYOUT) {
-        chatIds = await this.agent.messagerEngine.getChatsByLabel(
+        chatIds = await this.agent.messagerEngine.getChannelIdsByLabel(
           ChannelLabels.CALLS_PAYOUT
         );
       }
       if (callIdenty === CallIdenties.SERVICE) {
-        chatIds = await this.agent.messagerEngine.getChatsByLabel(
+        chatIds = await this.agent.messagerEngine.getChannelIdsByLabel(
           ChannelLabels.CALLS_SERVICE
         );
       }
@@ -68,7 +68,7 @@ class BotEvents implements AgentEventsInterface {
     // Get all masters by name
     const masters = await MasterManager.searchByName(query);
     // Send master buttons to dispatcher 
-    await this.agent.actions.sendOrderMastersButtons(order, dispatcher, masters);
+    await this.agent.actions.sendOrderMasterSelector(order, dispatcher, masters);
   }
 
   async onOrderMasterAssign(order: Order, master: MasterAgent) {
