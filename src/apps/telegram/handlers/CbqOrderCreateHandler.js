@@ -6,7 +6,7 @@ import CbqHandler from "./CbqHandler";
 class CbqOrderCreateHandler extends CbqHandler {
   async createOrder(callId) {
     let call = await db.call.findUnique({
-      where: { callId: callId },
+      where: { callId },
       select: {id: true, orderId: true, order: true, clientPhone: true}
     });
     if (!call.orderId) {

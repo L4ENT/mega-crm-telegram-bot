@@ -11,7 +11,7 @@ import { getFlowFromCbq, getFlowFromMessage } from "./utils";
 const router = new Router();
 
 router.addMessageRoute(
-  (msg: Message, flow: any) => flow?.data?.code === "flow:order:setmaster",
+  (msg: Message, flow: any) => flow?.data?.code === "order:searchmaster",
   SearchMasterHandler
 );
 
