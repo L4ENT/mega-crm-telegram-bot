@@ -14,11 +14,22 @@ class BotEvents implements AgentEventsInterface {
     this.agent = agent;
   }
 
+  /**
+   * Поступил новый звонок
+   *
+   * @param call
+   */
   async onNewCall(call: Call) {
     // Just send new call-messsage to special channel
-    await this.agent.actions.sendOutCallMessage(call)
+    await this.agent.actions.sendOutCallMessage(call);
   }
 
+  /**
+   * Звонку назначена категория
+   *
+   * @param call
+   * @param callIdenty
+   */
   async onCallIdent(call: Call, callIdenty: string) {
     if (callIdenty === CallIdenties.ORDER) {
       await this.agent.actions.sendOutCallMessage(call);
@@ -55,35 +66,75 @@ class BotEvents implements AgentEventsInterface {
     }
   }
 
-  async onOrderUpdate(order: Order) {
+  /**
+   * Заявка заполнена
+   *
+   * @param order
+   */
+  async onOrderFilled(order: Order) {
     await this.agent.actions.editMasterOrderMessages(order);
     await this.agent.actions.editDispatcherOrderMessages(order);
   }
 
+  /**
+   * Попытка найти мастера
+   *
+   * @param order
+   * @param dispatcher
+   * @param query
+   */
   async onOrderMasterSearch(
     order: Order,
     dispatcher: DispatcherAgent,
     query: string
   ) {
-    // Get all masters by name
     const masters = await MasterManager.searchByName(query);
-    // Send master buttons to dispatcher 
-    await this.agent.actions.sendOrderMasterSelector(order, dispatcher, masters);
+    await this.agent.actions.sendOrderMasterSelector(
+      order,
+      dispatcher,
+      masters
+    );
   }
 
+  /**
+   * Выбор мастера для заявки
+   *
+   * @param order
+   * @param master
+   */
   async onOrderMasterAssign(order: Order, master: MasterAgent) {
-    // Notify master
     await this.agent.actions.sendMasterOrderMessage(master, order);
-    // Change order message for all dispatchers
     await this.agent.actions.editDispatcherOrderMessages(order);
   }
 
+  /**
+   * Смена мастера
+   *
+   * @param order
+   * @param from
+   * @param to
+   */
   async onOrderMasterСhange(order: Order, from: MasterAgent, to: MasterAgent) {
     await this.agent.actions.sendMasterOrderMessage(to, order);
     await this.agent.actions.removeMasterOrderMessage(from, order);
     await this.agent.actions.editDispatcherOrderMessages(order);
   }
 
+  /**
+   * Обновление заказа
+   *
+   * @param order
+   */
+  async onOrderUpdate(order: Order) {
+    await this.agent.actions.editMasterOrderMessages(order);
+    await this.agent.actions.editDispatcherOrderMessages(order);
+  }
+
+  /**
+   * Гарантия создана
+   *
+   * @param order
+   */
   async onReceiptCreated(order: Order) {
     console.log("onReceiptCreated", {
       order,
