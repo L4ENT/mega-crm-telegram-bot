@@ -70,6 +70,7 @@ model MessagerFlow {
   userUid String @db.VarChar(256)
   chatUid String @db.VarChar(256)
 
+  key    String?
   active Boolean @default(false)
   data   String
 

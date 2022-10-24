@@ -1,6 +1,7 @@
-import db from "../../../db";
-import MessagerRepository from "../../../repository/messager-repository";
-import { getTelegramMessager } from "../utils";
+import { getTelegramMessager } from "@src/apps/telegram/utils";
+import db from "@src/db";
+import MessagerRepository from "@src/repository/messager-repository";
+
 
 
 async function simpleMessageMiddleware(update) {

@@ -10,6 +10,6 @@ export default class ManagerAgent implements AgentInterface {
 
     constructor(){
         this.events = new ManagerEvents(this)
-        this.events = new ManagerActions(this)
+        this.actions = new ManagerActions(this)
     }
 }

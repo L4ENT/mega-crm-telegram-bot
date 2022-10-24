@@ -10,15 +10,46 @@ export default class DispatcherActions implements AgentActionsInterface {
     this.agent = agent;
   }
 
-  async searchForOrderMaster(order: Order, query: string) {
-    // The bot will send keyboard with buttons (each button user option)  
+  /**
+     * Поиск мастера по миени (отправляет кнопки в чат)
+     * 
+     * @param order 
+     * @param query 
+     */
+  async startAssignMasterOnOrder() {  
+    await this.agent.bot.events.onStartAssignMaster(this.agent);
+  }
+
+  /**
+   * Поиск мастера по миени (отправляет кнопки в чат)
+   * 
+   * @param order 
+   * @param query 
+   */
+  async searchForOrderMaster(order: Order, query: string) {  
     await this.agent.bot.events.onOrderMasterSearch(order, this.agent, query);
   }
 
+  /**
+   * Назначаем мастера на заявку
+   * 
+   * @param order 
+   * @param master 
+   */
   async assignOrderToMaster(order: Order, master: MasterAgent) {
-    // Set order master
     await master.events.onOrderAssign(order)
-    // Notify bot about it
     await this.agent.bot.events.onOrderMasterAssign(order, master)
+  }
+
+  /**
+   * меняем мастера
+   * 
+   * @param order 
+   * @param newMaster 
+   */
+   async changeOrderMaster(order: Order, newMaster: MasterAgent) {
+    await newMaster.events.onOrderAssign(order)
+    const oldMaster = new MasterAgent(order.masterId)
+    await this.agent.bot.events.onOrderMasterСhange(order, oldMaster, newMaster)
   }
 }

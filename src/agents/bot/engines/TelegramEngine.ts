@@ -25,9 +25,68 @@ import masterSelectInlineKeyboard, {
   dispatcherOrderInlineKB,
   orderFormMessage,
   orderMessageForDispatcher,
+  orderMessageForMaster,
 } from "@src/agents/bot/utils";
+import { getTelegramMessager } from "@src/apps/telegram/utils";
 
 export default class TelegramEngine implements MessagerEngineInterface {
+  /**
+   * Remove order mesage
+   * @param order
+   * @param message
+   */
+  async removeOrderMessage(
+    order: Order,
+    messageId: string,
+    chatId: string
+  ): Promise<any> {
+    return await db.orderMessage.delete({
+      where: {
+        orderId_chatUid_messageUid: {
+          orderId: order.id,
+          chatUid: messageId,
+          messageUid: chatId,
+        },
+      },
+    });
+  }
+  /**
+   * Save order mesage
+   * @param order
+   * @param message
+   */
+  async saveOrderMessage(
+    order: Order,
+    message: TelegramBot.Message
+  ): Promise<any> {
+    const messager = await getTelegramMessager();
+    const channel = await db.messagerChannel.findUnique({
+      where: {
+        uid_messagerId: {
+          uid: message.chat.id.toString(),
+          messagerId: messager.id,
+        },
+      },
+    });
+    await db.orderMessage.upsert({
+      where: {
+        orderId_chatUid_messageUid: {
+          orderId: order.id,
+          chatUid: message.chat.id.toString(),
+          messageUid: message.message_id.toString(),
+        },
+      },
+      create: {
+        orderId: order.id,
+        chatUid: message.chat.id.toString(),
+        messageUid: message.message_id.toString(),
+        messagerChannelId: channel ? channel.id : undefined,
+      },
+      update: {
+        messagerChannelId: channel ? channel.id : undefined,
+      },
+    });
+  }
   /**
    * Send message to Telegram
    *
@@ -37,10 +96,10 @@ export default class TelegramEngine implements MessagerEngineInterface {
    * @returns
    */
   async sendMessage(
-    chatId: string,
+    chatId: string | number,
     text: string,
     opts?: SendMessageOptions
-  ): Promise<boolean | TelegramBot.Message> {
+  ): Promise<TelegramBot.Message> {
     return await bot.sendMessage(chatId, text, opts);
   }
 
@@ -59,11 +118,19 @@ export default class TelegramEngine implements MessagerEngineInterface {
     chatId: string,
     opts: EditMessageTextOptions
   ): Promise<boolean | TelegramBot.Message> {
-    return await bot.editMessageText(text, {
-      ...opts,
-      message_id: parseInt(messageId),
-      chat_id: chatId,
-    });
+    console.log("Telegram edit message", { messageId, chatId, text });
+    
+    let message = null;
+    try {
+      message = await bot.editMessageText(text, {
+        ...opts,
+        message_id: parseInt(messageId),
+        chat_id: chatId,
+      });
+    } catch (error) {
+      console.log('Edit message probliem')
+    }
+    return message
   }
 
   /**
@@ -78,7 +145,7 @@ export default class TelegramEngine implements MessagerEngineInterface {
     chatId: string,
     messageId: string,
     opts?: any
-  ): Promise<boolean | TelegramBot.Message> {
+  ): Promise<boolean> {
     return await bot.deleteMessage(chatId, messageId, opts);
   }
 
@@ -124,7 +191,7 @@ export default class TelegramEngine implements MessagerEngineInterface {
     agent: AgentWithIdInterface,
     order: Order
   ): Promise<any> {
-    let labels: Prisma.MessagerChannelLabelListRelationFilter;
+    let labels: Prisma.MessagerChannelLabelListRelationFilter = {};
 
     if (agent instanceof MasterAgent) {
       labels.some = {
@@ -162,10 +229,10 @@ export default class TelegramEngine implements MessagerEngineInterface {
 
   /**
    * Get order messages by channel label
-   * 
-   * @param order 
-   * @param label 
-   * @returns 
+   *
+   * @param order
+   * @param label
+   * @returns
    */
   async getOrderMessagesByLabel(order: Order, label: string) {
     return await db.orderMessage.findMany({
@@ -189,6 +256,7 @@ export default class TelegramEngine implements MessagerEngineInterface {
    * @returns
    */
   async getChannelIdsByLabel(label: string): Promise<any> {
+    // TODO Fix duplicate
     const channels = await db.messagerChannel.findMany({
       where: {
         labels: {
@@ -212,11 +280,29 @@ export default class TelegramEngine implements MessagerEngineInterface {
     chatId: string,
     order: Order
   ): Promise<TelegramBot.Message> {
-    return await bot.sendMessage(chatId, orderMessageForDispatcher(order), {
+    const text = await orderMessageForDispatcher(order);
+    return await bot.sendMessage(chatId, text, {
       parse_mode: "HTML",
       reply_markup: {
         inline_keyboard: dispatcherOrderInlineKB(order),
       },
+    });
+  }
+
+  /**
+   * Master channel. Order message
+   *
+   * @param chatId
+   * @param order
+   * @returns
+   */
+  async sendOrderMasterMessage(
+    chatId: string | number,
+    order: Order
+  ): Promise<TelegramBot.Message> {
+    let text = await orderMessageForMaster(order);
+    return await this.sendMessage(chatId.toString(), text, {
+      parse_mode: "HTML",
     });
   }
 

@@ -76,7 +76,7 @@ class OrderApp {
       for (let orderMessage of masterOrderMessages) {
         if (!masterChannelsUids.includes(orderMessage.chatUid)) {
           try {
-            console.log('orderMessage', orderMessage)
+            console.log("orderMessage", orderMessage);
             await bot.deleteMessage(
               orderMessage.chatUid,
               orderMessage.messageUid
@@ -85,35 +85,32 @@ class OrderApp {
               where: {
                 orderId: order.id,
                 chatUid: orderMessage.chatUid,
-                messageUid: orderMessage.messageUid
-              }
-            })
+                messageUid: orderMessage.messageUid,
+              },
+            });
           } catch (err) {
-            console.log('Error')
+            console.log("Error");
           }
-          
         }
       }
     }
   }
 
   async sendOrderDispatcherMessage(chatUid, order) {
-    const message = await bot.sendMessage(
-      chatUid,
-      orderMessageForDispatcher(order),
-      {
-        parse_mode: "HTML",
-        reply_markup: {
-          inline_keyboard: dispatcherOrderInlineKB(order),
-        },
-      }
-    );
+    const text = await orderMessageForDispatcher(order);
+    const message = await bot.sendMessage(chatUid, text, {
+      parse_mode: "HTML",
+      reply_markup: {
+        inline_keyboard: dispatcherOrderInlineKB(order),
+      },
+    });
     await this.saveOrderMessage(order.id, message.chat.id, message.message_id);
   }
 
   async editOrderDispatcherMessage(chatUid, messageUid, order) {
+    const text = await orderMessageForDispatcher(order);
     try {
-      await bot.editMessageText(orderMessageForDispatcher(order), {
+      await bot.editMessageText(text, {
         message_id: messageUid,
         chat_id: chatUid,
         parse_mode: "HTML",
@@ -194,13 +191,10 @@ class OrderApp {
     });
 
     for (let channel of masterChannles) {
-      const message = await bot.sendMessage(
-        channel.uid,
-        orderMessageForMaster(order),
-        {
-          parse_mode: "HTML",
-        }
-      );
+      const text = await orderMessageForMaster(order);
+      const message = await bot.sendMessage(channel.uid, text, {
+        parse_mode: "HTML",
+      });
 
       await this.saveOrderMessage(order.id, channel.uid, message.message_id);
     }

@@ -1,4 +1,8 @@
 {
+  "ts-node": {
+    "transpileOnly": true,
+    "require": ["tsconfig-paths/register"]
+  },
   "exclude": [
     "node_modules"
   ],
@@ -14,6 +18,6 @@
   },
   "include": [
     "./**/*.ts",
-    "index.ts"
+    "./index.ts"
   ]
 }

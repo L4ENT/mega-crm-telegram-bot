@@ -1,11 +1,10 @@
 import moment = require("moment");
 import db from "../db";
-import CallsApp from "../apps/calls/CallsApp";
-import OrderApp from "../apps/orders/OrderApp";
 import TelegramApp from "../apps/telegram/TelegramApp";
-import { getTelegramMessager } from "../apps/telegram/utils";
 import CallDto from "@src/dto/CallDto";
 import TeAgent from "@src/agents/te/TeAgent";
+import ManagerAgent from "@src/agents/manager/ManagerAgent";
+import ChannelLabels from "@src/enums/ChannelLabels";
 
 /**
  * Handles every Telephone exchange API event
@@ -30,7 +29,7 @@ export const callsEntry = async (
 
   const teAgent = new TeAgent();
   await teAgent.events.onNewCall(dto);
-  res.status(200);
+  res.status(200).json({});
 };
 
 /**
@@ -107,8 +106,26 @@ export const orderFormPage = async (
       },
     });
 
-    const orderApp = new OrderApp();
-    await orderApp.syncOrderWithMessager(order);
+    const managerAgent = new ManagerAgent()
+
+    const messagesCount = await db.orderMessage.count({ where: {
+      orderId: order.id,
+      messagerChannel: {
+        labels: {
+          some: {
+            messagerlabelCode: ChannelLabels.DISPATCHER
+          }
+        }
+      }
+    }})
+    console.log(messagesCount)
+    if(messagesCount > 0) {
+      managerAgent.actions.updateOrder(order)
+    } else {
+      managerAgent.actions.fillOrder(order)
+    }
+    
+    
   }
 
   const deviceTypes = await db.deviceType.findMany();

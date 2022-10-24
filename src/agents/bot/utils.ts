@@ -3,6 +3,9 @@ import CallTypes from "@src/apps/calls/enums/CallTypes";
 
 import moment = require("moment");
 import { Call, Order, User } from "@prisma/client";
+import AssignMasterFlow from "@src/apps/telegram/flows/AssignmasterFlow";
+import ChangeMasterFlow from "@src/apps/telegram/flows/ChangeMasterFlow";
+import db from "@src/db";
 
 export function orderFormMessage(order: Order) {
   const link = `${config.PUBLIC_URL}/order-form?t=${order.id}`;
@@ -11,7 +14,7 @@ export function orderFormMessage(order: Order) {
   return message;
 }
 
-export function orderMessageForDispatcher(order) {
+export async function orderMessageForDispatcher(order: Order) {
   let message =
     `Заявка № ${order.id}\n\n` +
     `<b>Имя клиента</b>: ${order.clientName}\n` +
@@ -20,17 +23,26 @@ export function orderMessageForDispatcher(order) {
     `<b>Адрес</b>: ${order.fullAddress}\n` +
     `<b>Неисправность</b>: ${order.defect}\n` +
     `<b>Марка</b>: ${order.brand}\n` +
-    `<b>Модель</b>: ${order.model}\n` +
-    `<b>Тип устройства</b>: ${order.deviceType.title}\n`;
+    `<b>Модель</b>: ${order.model}\n`;
+
+  if (order.deviceTypeId) {
+    const deviceType = await db.deviceType.findUnique({
+      where: { id: order.deviceTypeId },
+    });
+    message += `<b>Тип устройства</b>: ${deviceType.title}\n`;
+  }
 
   if (order.masterId) {
-    message += `\n<b>Мастер</b>: ${order.master.fullName}\n`;
+    const master = await db.user.findUnique({
+      where: { id: order.masterId },
+    });
+    message += `\n<b>Мастер</b>: ${master.fullName}\n`;
   }
   return message;
 }
 
-export function orderMessageForMaster(order) {
-  return (
+export async function orderMessageForMaster(order: Order) {
+  let message = 
     `Заявка № ${order.id}\n\n` +
     `<b>Имя клиента</b>: ${order.clientName}\n` +
     `<b>Номер телефона</b>: ${order.clientPhone}\n` +
@@ -38,18 +50,32 @@ export function orderMessageForMaster(order) {
     `<b>Адрес</b>: ${order.fullAddress}\n` +
     `<b>Неисправность</b>: ${order.defect}\n` +
     `<b>Марка</b>: ${order.brand}\n` +
-    `<b>Модель</b>: ${order.model}\n` +
-    `<b>Тип устройства</b>: ${order.deviceType.title}\n`
-  );
+    `<b>Модель</b>: ${order.model}\n`
+
+  if (order.deviceTypeId) {
+    const deviceType = await db.deviceType.findUnique({
+      where: { id: order.deviceTypeId },
+    });
+    message += `<b>Тип устройства</b>: ${deviceType.title}\n`;
+  }
+
+  if (order.masterId) {
+    const master = await db.user.findUnique({
+      where: { id: order.masterId },
+    });
+    message += `\n<b>Мастер</b>: ${master.fullName}\n`;
+  }
+
+  return message
 }
 
-export function dispatcherOrderInlineKB(order) {
+export function dispatcherOrderInlineKB(order: Order) {
   let inline_keyboard = [
     [
       {
         text: "Назначить на мастера",
         callback_data: JSON.stringify({
-          cmd: "order:setmaster",
+          cmd: `flow:start:${AssignMasterFlow.getKey()}`,
           orderId: order.id,
         }),
       },
@@ -62,7 +88,7 @@ export function dispatcherOrderInlineKB(order) {
         {
           text: "Сменить мастера",
           callback_data: JSON.stringify({
-            cmd: "order:changemaster",
+            cmd: `flow:start:${ChangeMasterFlow.getKey()}`,
             orderId: order.id,
           }),
         },
@@ -137,7 +163,7 @@ export default function masterSelectInlineKeyboard(
         callback_data: JSON.stringify({
           cmd: "order:assignmaster",
           orderId: order.id,
-          userId: user.id,
+          masterId: user.id,
         }),
       },
     ]);

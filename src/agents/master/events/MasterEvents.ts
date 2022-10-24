@@ -1,6 +1,7 @@
 import { Order } from "@prisma/client";
 import AgentEventsInterface from "@src/agents/AgentEventsInterface";
 import MasterAgent from "@src/agents/master/MasterAgent";
+import OrderManager from "@src/managers/OrderManager";
 
 class MasterEvents implements AgentEventsInterface{
   agent: MasterAgent;
@@ -10,8 +11,8 @@ class MasterEvents implements AgentEventsInterface{
   }
 
   async onOrderAssign(order: Order) {
-    //TODO: Set order.master
-    throw Error("Not implemented")
+    await OrderManager.setMaster(order.id, parseInt(this.agent.identity))
+    this.agent.bot.events.onOrderMasterAssign(order, this.agent)
   }
 }
 

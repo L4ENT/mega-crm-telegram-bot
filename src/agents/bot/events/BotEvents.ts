@@ -25,6 +25,15 @@ class BotEvents implements AgentEventsInterface {
   }
 
   /**
+   * Запрос на заполенение заявки
+   *
+   * @param order
+   */
+  async onOrderLink(order: Order) {
+    await this.agent.actions.sendOrderFormLink(order);
+  }
+
+  /**
    * Звонку назначена категория
    *
    * @param call
@@ -72,8 +81,24 @@ class BotEvents implements AgentEventsInterface {
    * @param order
    */
   async onOrderFilled(order: Order) {
-    await this.agent.actions.editMasterOrderMessages(order);
-    await this.agent.actions.editDispatcherOrderMessages(order);
+    await this.agent.actions.sendOrderDispatcherMessage(order);
+  }
+
+  /**
+   * Попытка найти мастера
+   *
+   * @param order
+   * @param agent
+   */
+  async onStartAssignMaster(agent: DispatcherAgent) {
+    // TODO: отправляем сообщение мол введите имя мастера
+
+    const chatId = await this.agent.messagerEngine.getChatIdByAgent(agent);
+
+    await this.agent.messagerEngine.sendMessage(
+      chatId,
+      "Пожалуйста введите имя мастера"
+    );
   }
 
   /**

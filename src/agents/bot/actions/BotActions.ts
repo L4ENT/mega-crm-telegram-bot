@@ -2,6 +2,7 @@ import { Call, Order } from "@prisma/client";
 import AgentActionsInterface from "@src/agents/AgentActionsInterface";
 import BotAgent from "@src/agents/bot/BotAgent";
 import {
+  dispatcherOrderInlineKB,
   orderMessageForDispatcher,
   orderMessageForMaster,
 } from "@src/agents/bot/utils";
@@ -9,6 +10,7 @@ import DispatcherAgent from "@src/agents/dispatcher/DispatcherAgent";
 import MasterAgent from "@src/agents/master/MasterAgent";
 import db from "@src/db";
 import ChannelLabels from "@src/enums/ChannelLabels";
+import { Message } from "node-telegram-bot-api";
 
 class BotActions implements AgentActionsInterface {
   agent: BotAgent;
@@ -59,7 +61,12 @@ class BotActions implements AgentActionsInterface {
     );
 
     for (let chatId of chatIds) {
-      this.agent.messagerEngine.sendOrderDispatcherMessage(chatId, order);
+      const mesage: Message =
+        await this.agent.messagerEngine.sendOrderDispatcherMessage(
+          chatId,
+          order
+        );
+      await this.agent.messagerEngine.saveOrderMessage(order, mesage);
     }
   }
 
@@ -100,17 +107,14 @@ class BotActions implements AgentActionsInterface {
       order,
       ChannelLabels.DISPATCHER
     );
-    for (let { chatId, messageId } of messages) {
-      await this.agent.messagerEngine.editMessage(
-        orderMessageForDispatcher(order),
-        messageId,
-        chatId,
-        {
-          reply_markup: {
-            inline_keyboard: [],
-          },
-        }
-      );
+    for (let { chatUid, messageUid } of messages) {
+      const text = await orderMessageForDispatcher(order);
+      await this.agent.messagerEngine.editMessage(text, messageUid, chatUid, {
+        reply_markup: {
+          inline_keyboard: dispatcherOrderInlineKB(order),
+        },
+        parse_mode: "HTML",
+      });
     }
   }
 
@@ -122,10 +126,11 @@ class BotActions implements AgentActionsInterface {
    */
   async sendMasterOrderMessage(master: MasterAgent, order: Order) {
     const chatId = await this.agent.messagerEngine.getChatIdByAgent(master);
-
-    let message = orderMessageForMaster(order);
-    await this.agent.messagerEngine.sendMessage(chatId.toString(), message);
-    // TODO: Save message to db
+    const message = await this.agent.messagerEngine.sendOrderMasterMessage(
+      chatId,
+      order
+    );
+    await this.agent.messagerEngine.saveOrderMessage(order, message);
   }
 
   /**
@@ -138,13 +143,11 @@ class BotActions implements AgentActionsInterface {
       order,
       ChannelLabels.MASTER
     );
-    for (let { chatId, messageId } of messages) {
-      // TODO: Implement text of message
-      await this.agent.messagerEngine.editMessage(
-        orderMessageForMaster(order),
-        messageId,
-        chatId
-      );
+    for (let { chatUid, messageUid } of messages) {
+      const text = await orderMessageForMaster(order);
+      await this.agent.messagerEngine.editMessage(text, messageUid, chatUid, {
+        parse_mode: "HTML"
+      });
     }
   }
 
@@ -155,10 +158,14 @@ class BotActions implements AgentActionsInterface {
    * @param order
    */
   async removeMasterOrderMessage(master: MasterAgent, order: Order) {
-    const { chatId, messageId } =
+    const { channelId, messageId } =
       await this.agent.messagerEngine.getOrderMessageByAgent(master, order);
-    await this.agent.messagerEngine.deleteMessage(chatId, messageId);
-    // TODO: Remove message from db
+    await this.agent.messagerEngine.deleteMessage(channelId, messageId);
+    await this.agent.messagerEngine.removeOrderMessage(
+      order,
+      messageId,
+      channelId
+    );
   }
 }
 export default BotActions;

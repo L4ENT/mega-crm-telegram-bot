@@ -1,3 +1,7 @@
+import FlowInterface from "@src/apps/telegram/flows/FlowInterFace";
+import CbqHandler from "@src/apps/telegram/handlers/CbqHandler";
+import MessageHandler from "@src/apps/telegram/handlers/MessageHandler";
+import { CallbackQuery, Message } from "node-telegram-bot-api";
 import bot from "../../tgbot/index";
 
 class Router {
@@ -9,19 +13,19 @@ class Router {
     this.callbackQueryRoutes = [];
   }
 
-  addMessageRoute(condition, Handler) {
+  addMessageRoute(condition, Handler: typeof MessageHandler) {
     this.messageRoutes.push([condition, Handler]);
   }
 
-  addCbqRoute(condition, Handler) {
+  addCbqRoute(condition, Handler: typeof CbqHandler) {
     this.callbackQueryRoutes.push([condition, Handler]);
   }
 
-  async serveMessage(msg, flow) {
+  async serveMessage(msg: Message, flow: FlowInterface) {
     const handlers = [];
     for (let [condition, Handler] of this.messageRoutes) {
       if (condition(msg, flow)) {
-        handlers.push(new Handler(flow));
+        handlers.push(new Handler(this, flow));
       }
     }
 
@@ -30,11 +34,11 @@ class Router {
     }
   }
 
-  async serveCallbackQuery(cbq, flow) {
+  async serveCallbackQuery(cbq: CallbackQuery, flow: FlowInterface) {
     const handlers = [];
     for (let [condition, Handler] of this.callbackQueryRoutes) {
       if (condition(cbq, flow)) {
-        handlers.push(new Handler(flow));
+        handlers.push(new Handler(this, flow));
       }
     }
 
