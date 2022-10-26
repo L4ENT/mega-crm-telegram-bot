@@ -18,6 +18,7 @@ export async function orderMessageForDispatcher(order: Order) {
   let message =
     `Заявка #КБТ${order.id}\n\n` +
     `<b>Имя клиента</b>: ${order.clientName}\n` +
+    `#СВЯЗЬ${order.clientPhone}\n` +
     `<b>Номер телефона</b>: ${order.clientPhone}\n` +
     `<b>Доп. номер телефона</b>: ${order.additionalPhone}\n` +
     `<b>Адрес</b>: ${order.fullAddress}\n` +
@@ -47,6 +48,7 @@ export async function orderMessageForMaster(order: Order) {
   let message =
     `Заявка #КБТ${order.id}\n\n` +
     `<b>Имя клиента</b>: ${order.clientName}\n` +
+    `#СВЯЗЬ${order.clientPhone}\n` +
     `<b>Номер телефона</b>: ${order.clientPhone}\n` +
     `<b>Доп. номер телефона</b>: ${order.additionalPhone}\n` +
     `<b>Адрес</b>: ${order.fullAddress}\n` +
@@ -98,6 +100,7 @@ export function callMessage(dto: Call) {
   return (
     `${dto.type === CallTypes.IN ? "Входящий" : "Исходящий"} звонок\n\n` +
     `<b>Поступил</b>: ${moment(dto.date).format("DD.MM.YYYY hh:mm:ss")}\n` +
+    `#СВЯЗЬ${dto.clientPhone}\n` +
     `<b>Номер</b>: ${dto.clientPhone}\n` +
     `<b>Продолжительность</b>: ${dto.duration} сек.\n` +
     `<b>Запись</b>: <a href="${dto.recordLink}">${dto.recordLink}</a>\n`
