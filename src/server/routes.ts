@@ -172,7 +172,7 @@ export const warrantyFormPage = async (
     warranty = await db.warranty.update({
       where: { id: warranty.id },
       data: {
-        period: moment(req.body.period).toDate(),
+        period: parseInt(req.body.period),
         typeOfJob: req.body.typeOfJob,
         sparesPrice: parseFloat(req.body.sparesPrice),
         workPrice: parseFloat(req.body.workPrice),
@@ -189,10 +189,7 @@ export const warrantyFormPage = async (
   }
 
   res.render("warranty-form", {
-    warranty: {
-      ...warranty,
-      period: moment(warranty.period).format("YYYY-MM-DD"),
-    },
+    warranty,
     warrantyLink: WarrantyManager.getDownloadLink(warranty.id),
     submited,
   });
@@ -238,7 +235,7 @@ export const downloadWarranty = async (
   const buffer = await createReport({
     template,
     data: {
-      period: 12,
+      period: warranty.period,
       typeOfJob: warranty.typeOfJob,
       sparesPrice: warranty.sparesPrice,
       workPrice: warranty.workPrice,

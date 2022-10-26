@@ -222,7 +222,7 @@ model DeviceType {
 
 model Warranty {
   id          Int       @id @default(autoincrement())
-  period      DateTime? @db.Timestamptz(3)
+  period      Int?
   typeOfJob   String?
   sparesPrice Decimal?  @default(0)
   workPrice   Decimal?  @default(0)
