@@ -2,9 +2,11 @@ version: '3'
 
 volumes:
     db_data: {}
+    logs: {}
+    downloads: {}
 
 services:
-    nodejs:
+    server:
         container_name: mega_bot
         ports:
             - 3030:3030
@@ -13,7 +15,8 @@ services:
         environment:
             - LOGS_PATH=${LOGS_PATH}
         volumes:
-            - "./logs/back/:${LOGS_PATH}"
+            - logs:${LOGS_PATH}"
+            - downloads:${DOWNLOADS_PATH}"
         build:
             context: .
             dockerfile: docker/Dockerfile
@@ -22,7 +25,31 @@ services:
             - db
         links:
             - db
+        env_file:
+            - .env
         command: [ "/bin/sh", "-c", "npm run migrate:deploy && npm run start" ]
+    
+    schedule:
+        container_name: mega_scheduler
+        networks:
+            mega_crm:
+        environment:
+            - LOGS_PATH=${LOGS_PATH}
+        build:
+            context: .
+            dockerfile: docker/Dockerfile
+        restart: always
+        depends_on:
+            - db
+        links:
+            - db
+        volumes:
+            - logs:${LOGS_PATH}"
+            - downloads:${DOWNLOADS_PATH}"
+        env_file:
+            - .env
+        command: [ "/bin/sh", "-c", "npm run migrate:deploy && npm run schedule" ]
+    
     db:
         container_name: mega_db
         image: postgres
@@ -38,6 +65,8 @@ services:
         volumes:
             - ./docker/postgres/:/docker-entrypoint-initdb.d/
             - db_data:/var/lib/postgresql/data
+        env_file:
+            - .env
 
 networks:
     mega_crm:

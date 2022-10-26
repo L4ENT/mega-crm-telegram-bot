@@ -401,7 +401,7 @@ export default class TelegramEngine implements MessagerEngineInterface {
     const link = `${config.PUBLIC_URL}/warranty-form?o=${warranty.id}`;
 
     const message =
-      `Заявка №${warranty.orderId}. Пожалуйста заполните данные гарантии\n` +
+      `Заявка #КБТ${warranty.orderId}. Пожалуйста заполните данные гарантии\n` +
       `<a href="${link}">Ссылка на форму</a>`;
     await this.sendMessage(chatId, message, {
       parse_mode: "HTML",
@@ -412,7 +412,7 @@ export default class TelegramEngine implements MessagerEngineInterface {
     const link = WarrantyManager.getDownloadLink(warranty.id);
 
     const message =
-      `Гарантия на заявку №${warranty.orderId}\n` +
+      `Гарантия на заявку #КБТ${warranty.orderId}\n` +
       `<a href="${link}">Скачать гарантию</a>`;
     await this.sendMessage(chatId, message, {
       parse_mode: "HTML",

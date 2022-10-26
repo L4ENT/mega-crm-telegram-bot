@@ -4,7 +4,9 @@ import config from "../config";
 
 const bot = new TelegramBot (config.BOT_TOKEN);
 
-bot.setWebHook(`${config.PUBLIC_URL}/bot${config.BOT_TOKEN}`);
+if(config.TELEGRAM_SET_WEBHOOK) {
+  bot.setWebHook(`${config.PUBLIC_URL}/bot${config.BOT_TOKEN}`);
+}
 
 bot.on("message", (msg) => {
   const telegramApp = new TelegramApp();

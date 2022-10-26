@@ -1,7 +1,7 @@
 doctype html
 html
    head
-      title Заявка №#{order.id}
+      title Заявка #КБТ#{order.id}
    style(type="text/css").
       .page-wrapper {
          display: flex;
@@ -58,12 +58,12 @@ html
       div.page-wrapper
          if submited
             div.form-wrapper
-               h2 Заявка №#{order.id} сохранена и направлена диспетчеру
+               h2 Заявка #КБТ#{order.id} сохранена и направлена диспетчеру
                p
                   a(href=`/order-form?t=${order.id}`) Вернуться к редактированию заявки
          else
             div.form-wrapper
-               h2 Заявка №#{order.id} 
+               h2 Заявка #КБТ#{order.id} 
                p Номер клиента:
                   a(href=`tel:+${order.clientPhone}`) +#{order.clientPhone} 
                form(action=`/order-form?t=${order.id}`, method="post") 

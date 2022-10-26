@@ -1,7 +1,7 @@
 doctype html
 html
    head
-      title Гарантия №#{warranty.id}
+      title Гарантия
    style(type="text/css").
       .page-wrapper {
          display: flex;
@@ -58,14 +58,14 @@ html
       div.page-wrapper
          if submited 
             div.form-wrapper
-               h2 Гарантия №#{warranty.id} сохранена
+               h2 Гарантия на заявку #КБТ#{warranty.orderId} сохранена
                p
                   a(href=warrantyLink) Скачать гарантию
                p
                   a(href=`/warranty-form?o=${warranty.id}`) Вернуться к редактированию гарантии
          else
             div.form-wrapper
-               h2 Гарантия №#{warranty.id} (Заявка №#{warranty.orderId}))
+               h2 Гарантия (Заявка #КБТ#{warranty.orderId})
                p Номер клиента:
                   a(href=`tel:+${warranty.order.clientPhone}`) +#{warranty.order.clientPhone} 
                form(action=`/warranty-form?o=${warranty.id}`, method="post") 

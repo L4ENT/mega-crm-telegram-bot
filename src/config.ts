@@ -7,5 +7,6 @@ export default {
     PUBLIC_URL: process.env.PUBLIC_URL,
     PORT: process.env.PORT,
     TEMPLATES_PATH: process.env.TEMPLATES_PATH,
-    DOWNLOADS_PATH: process.env.DOWNLOADS_PATH
+    DOWNLOADS_PATH: process.env.DOWNLOADS_PATH,
+    TELEGRAM_SET_WEBHOOK: process.env.TELEGRAM_SET_WEBHOOK.toLowerCase() == "true"
 }

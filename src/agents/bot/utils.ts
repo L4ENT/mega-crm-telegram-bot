@@ -10,40 +10,13 @@ import db from "@src/db";
 export function orderFormMessage(order: Order) {
   const link = `${config.PUBLIC_URL}/order-form?t=${order.id}`;
   const message =
-    `Заявка №${order.id}\n` + `<a href="${link}">Ссылка на форму</a>`;
+    `Заявка #КБТ${order.id}\n` + `<a href="${link}">Ссылка на форму</a>`;
   return message;
 }
 
 export async function orderMessageForDispatcher(order: Order) {
   let message =
-    `Заявка № ${order.id}\n\n` +
-    `<b>Имя клиента</b>: ${order.clientName}\n` +
-    `<b>Номер телефона</b>: ${order.clientPhone}\n` +
-    `<b>Доп. номер телефона</b>: ${order.additionalPhone}\n` +
-    `<b>Адрес</b>: ${order.fullAddress}\n` +
-    `<b>Неисправность</b>: ${order.defect}\n` +
-    `<b>Марка</b>: ${order.brand}\n` +
-    `<b>Модель</b>: ${order.model}\n`;
-
-  if (order.deviceTypeId) {
-    const deviceType = await db.deviceType.findUnique({
-      where: { id: order.deviceTypeId },
-    });
-    message += `<b>Тип устройства</b>: ${deviceType.title}\n`;
-  }
-
-  if (order.masterId) {
-    const master = await db.user.findUnique({
-      where: { id: order.masterId },
-    });
-    message += `\n<b>Мастер</b>: ${master.fullName}\n`;
-  }
-  return message;
-}
-
-export async function orderMessageForMaster(order: Order) {
-  let message =
-    `Заявка № ${order.id}\n\n` +
+    `Заявка #КБТ${order.id}\n\n` +
     `<b>Имя клиента</b>: ${order.clientName}\n` +
     `<b>Номер телефона</b>: ${order.clientPhone}\n` +
     `<b>Доп. номер телефона</b>: ${order.additionalPhone}\n` +
@@ -65,6 +38,27 @@ export async function orderMessageForMaster(order: Order) {
     });
     message += `\n<b>Статус</b>: Установлена\n`;
     message += `<b>Мастер</b>: ${master.fullName}\n`;
+  }
+
+  return message;
+}
+
+export async function orderMessageForMaster(order: Order) {
+  let message =
+    `Заявка #КБТ${order.id}\n\n` +
+    `<b>Имя клиента</b>: ${order.clientName}\n` +
+    `<b>Номер телефона</b>: ${order.clientPhone}\n` +
+    `<b>Доп. номер телефона</b>: ${order.additionalPhone}\n` +
+    `<b>Адрес</b>: ${order.fullAddress}\n` +
+    `<b>Неисправность</b>: ${order.defect}\n` +
+    `<b>Марка</b>: ${order.brand}\n` +
+    `<b>Модель</b>: ${order.model}\n`;
+
+  if (order.deviceTypeId) {
+    const deviceType = await db.deviceType.findUnique({
+      where: { id: order.deviceTypeId },
+    });
+    message += `<b>Тип устройства</b>: ${deviceType.title}\n`;
   }
 
   return message;
