@@ -63,7 +63,8 @@ export async function orderMessageForMaster(order: Order) {
     const master = await db.user.findUnique({
       where: { id: order.masterId },
     });
-    message += `\n<b>Мастер</b>: ${master.fullName}\n`;
+    message += `\n<b>Статус</b>: Установлена\n`;
+    message += `<b>Мастер</b>: ${master.fullName}\n`;
   }
 
   return message
