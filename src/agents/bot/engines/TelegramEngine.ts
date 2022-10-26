@@ -13,6 +13,7 @@ import {
   OrderMessage,
   Prisma,
   User,
+  Warranty,
 } from "@prisma/client";
 import db from "@src/db";
 import AgentWithIdInterface from "@src/agents/AgentWithIdInterface";
@@ -23,11 +24,14 @@ import masterSelectInlineKeyboard, {
   callMessage,
   callMessagerInlineKeyboard,
   dispatcherOrderInlineKB,
+  masterOrderInlineKeyboard,
   orderFormMessage,
   orderMessageForDispatcher,
   orderMessageForMaster,
 } from "@src/agents/bot/utils";
 import { getTelegramMessager } from "@src/apps/telegram/utils";
+import config from "@src/config";
+import WarrantyManager from "@src/managers/WarrantyManager";
 
 export default class TelegramEngine implements MessagerEngineInterface {
   /**
@@ -116,9 +120,9 @@ export default class TelegramEngine implements MessagerEngineInterface {
   async editMessage(
     text: string,
     messageId: string,
-    chatId: string,
+    chatId: string | number,
     opts: EditMessageTextOptions
-  ): Promise<boolean | TelegramBot.Message> {
+  ): Promise<TelegramBot.Message> {
     console.log("Telegram edit message", { messageId, chatId, text });
 
     let message = null;
@@ -128,9 +132,7 @@ export default class TelegramEngine implements MessagerEngineInterface {
         message_id: parseInt(messageId),
         chat_id: chatId,
       });
-    } catch (error) {
-      throw error
-    }
+    } catch (error) {}
     return message;
   }
 
@@ -305,6 +307,30 @@ export default class TelegramEngine implements MessagerEngineInterface {
     let text = await orderMessageForMaster(order);
     return await this.sendMessage(chatId.toString(), text, {
       parse_mode: "HTML",
+      reply_markup: {
+        inline_keyboard: masterOrderInlineKeyboard(order),
+      },
+    });
+  }
+
+  /**
+   * Master channel. Edit order message
+   *
+   * @param chatId
+   * @param order
+   * @returns
+   */
+  async editOrderMasterMessage(
+    chatId: string | number,
+    messageId: string,
+    order: Order
+  ): Promise<TelegramBot.Message> {
+    const text = await orderMessageForMaster(order);
+    return await this.editMessage(text, messageId, chatId, {
+      parse_mode: "HTML",
+      reply_markup: {
+        inline_keyboard: masterOrderInlineKeyboard(order),
+      },
     });
   }
 
@@ -366,5 +392,29 @@ export default class TelegramEngine implements MessagerEngineInterface {
         inline_keyboard: inlineKeyboard,
       },
     });
+  }
+
+  async sendWarrantyFormLink(chatId: string | number, warranty: Warranty): Promise<any> {
+    const link = `${config.PUBLIC_URL}/warranty-form?o=${warranty.id}`
+
+    const message = (
+      `Пожалуйста заполните данные гарантии\n` +
+      `<a href="${link}">Ссылка на форму</a>`
+    )
+    await this.sendMessage(chatId, message, {
+      parse_mode: "HTML"
+    })
+  }
+
+  async sendWarranty(chatId: string | number, warranty: Warranty) {
+    const link = WarrantyManager.getDownloadLink(warranty.id)
+
+    const message = (
+      `Гарантия на заявку №${warranty.orderId}\n` +
+      `<a href="${link}">Скачать гарантию</a>`
+    )
+    await this.sendMessage(chatId, message, {
+      parse_mode: "HTML"
+    })
   }
 }

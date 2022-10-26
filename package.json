@@ -24,6 +24,7 @@
   "dependencies": {
     "@prisma/client": "^4.4.0",
     "@types/node-telegram-bot-api": "^0.57.5",
+    "docx-templates": "^4.9.2",
     "dotenv": "^16.0.3",
     "express": "^4.18.2",
     "moment": "^2.29.4",

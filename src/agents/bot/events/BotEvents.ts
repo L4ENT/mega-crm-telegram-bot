@@ -1,4 +1,4 @@
-import { Call, Order } from "@prisma/client";
+import { Call, Order, Warranty } from "@prisma/client";
 import AgentEventsInterface from "@src/agents/AgentEventsInterface";
 import BotAgent from "@src/agents/bot/BotAgent";
 import DispatcherAgent from "@src/agents/dispatcher/DispatcherAgent";
@@ -154,16 +154,24 @@ class BotEvents implements AgentEventsInterface {
   }
 
   /**
-   * Гарантия создана
+   * Гарантия создана отправлям ссылку на форму
    *
-   * @param order
+   * @param master
+   * @param warranty
    */
-  async onReceiptCreated(order: Order) {
-    console.log("onReceiptCreated", {
-      order,
-    });
-    throw Error("Not implemented");
+  async onWarrantyCreated(master: MasterAgent, warranty: Warranty) {
+    this.agent.actions.sendWarrantyFormLink(master, warranty);
   }
+
+   /**
+   * Гарантия выпущена. Закидываем ее в ТГ мастеру, в канал DEPOSIT и клиенту
+   *
+   * @param master
+   * @param warranty
+   */
+    async onWarrantyIssued(master: MasterAgent, warranty: Warranty) {
+      this.agent.actions.sendWarrantyToMaster(master, warranty);
+    }
 }
 
 export default BotEvents;

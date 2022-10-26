@@ -12,6 +12,7 @@ import AssignMasterFlow from "@src/apps/telegram/flows/AssignmasterFlow";
 import BaseFlow from "@src/apps/telegram/flows/BaseFlow";
 import ChangeMasterFlow from "@src/apps/telegram/flows/ChangeMasterFlow";
 import CbqStartChangeMasterHandler from "@src/apps/telegram/handlers/CbqStartChangeMasterHandler";
+import CbqMakeWarrantyHandler from "@src/apps/telegram/handlers/CbqMakeWarrantyHandler";
 
 const router = new Router();
 
@@ -37,7 +38,8 @@ router.addCbqRoute(
  */
 router.addMessageRoute(
   (msg: Message, flow: BaseFlow) =>
-    flow && [AssignMasterFlow.getKey(), ChangeMasterFlow.getKey()].includes(flow.key),
+    flow &&
+    [AssignMasterFlow.getKey(), ChangeMasterFlow.getKey()].includes(flow.key),
   SearchMasterHandler
 );
 
@@ -67,6 +69,13 @@ router.addCbqRoute((cbq: CallbackQuery, flow: BaseFlow) => {
   const cmdCondition = JSON.parse(cbq.data).cmd === "order:assignmaster";
   return flowCondition && cmdCondition;
 }, CbqChangeMasterHandler);
+
+/**
+ * CBQ когда меняем мастера
+ */
+router.addCbqRoute((cbq: CallbackQuery, flow: BaseFlow) => {
+  return JSON.parse(cbq.data).cmd === "order:warranty";
+}, CbqMakeWarrantyHandler);
 
 class TelegramApp {
   miidlewares: ((update: any) => Promise<any>)[];

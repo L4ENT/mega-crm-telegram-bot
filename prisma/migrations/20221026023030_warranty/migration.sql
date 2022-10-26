@@ -1,0 +1,5 @@
+-- AlterTable
+ALTER TABLE "warranty" ALTER COLUMN "period" DROP NOT NULL,
+ALTER COLUMN "typeOfJob" DROP NOT NULL,
+ALTER COLUMN "sparesPrice" DROP NOT NULL,
+ALTER COLUMN "workPrice" DROP NOT NULL;

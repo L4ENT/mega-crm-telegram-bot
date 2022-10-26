@@ -1,4 +1,4 @@
-import { Call, Order } from "@prisma/client";
+import { Call, Order, Warranty } from "@prisma/client";
 import AgentActionsInterface from "@src/agents/AgentActionsInterface";
 import BotAgent from "@src/agents/bot/BotAgent";
 import {
@@ -145,10 +145,7 @@ class BotActions implements AgentActionsInterface {
       ChannelLabels.MASTER
     );
     for (let { chatUid, messageUid } of messages) {
-      const text = await orderMessageForMaster(order);
-      await this.agent.messagerEngine.editMessage(text, messageUid, chatUid, {
-        parse_mode: "HTML"
-      });
+      await this.agent.messagerEngine.editOrderMasterMessage(chatUid, messageUid, order)
     }
   }
 
@@ -168,5 +165,27 @@ class BotActions implements AgentActionsInterface {
       channelId
     );
   }
+
+   /**
+   * Отправляем ссыдку на форму с гарантией
+   *
+   * @param master
+   * @param warranty
+   */
+    async sendWarrantyFormLink(master: MasterAgent, warranty: Warranty) {
+      const chatId = await this.agent.messagerEngine.getChatIdByAgent(master)
+      await this.agent.messagerEngine.sendWarrantyFormLink(chatId, warranty)
+    }
+
+    /**
+   * Отправляем мастеру гарантию
+   *
+   * @param master
+   * @param warranty
+   */
+     async sendWarrantyToMaster(master: MasterAgent, warranty: Warranty) {
+      const chatId = await this.agent.messagerEngine.getChatIdByAgent(master)
+      await this.agent.messagerEngine.sendWarranty(chatId, warranty)
+    }
 }
 export default BotActions;

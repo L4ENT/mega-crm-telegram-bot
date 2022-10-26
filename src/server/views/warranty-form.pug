@@ -1,7 +1,7 @@
 doctype html
 html
    head
-      title Заявка №#{order.id}
+      title Гарантия №#{warranty.id}
    style(type="text/css").
       .page-wrapper {
          display: flex;
@@ -56,61 +56,48 @@ html
       }
    body
       div.page-wrapper
-         if submited
+         if submited 
             div.form-wrapper
-               h2 Заявка №#{order.id} сохранена и направлена диспетчеру
+               h2 Гарантия №#{warranty.id} сохранена
                p
-                  a(href=`/order-form?t=${order.id}`) Вернуться к редактированию заявки
+                  a(href=warrantyLink) Скачать гарантию
+               p
+                  a(href=`/warranty-form?o=${warranty.id}`) Вернуться к редактированию гарантии
          else
             div.form-wrapper
-               h2 Заявка №#{order.id} 
+               h2 Гарантия №#{warranty.id} (Заявка №#{warranty.orderId}))
                p Номер клиента:
-                  a(href=`tel:+${order.clientPhone}`) +#{order.clientPhone} 
-               form(action=`/order-form?t=${order.id}`, method="post") 
+                  a(href=`tel:+${warranty.order.clientPhone}`) +#{warranty.order.clientPhone} 
+               form(action=`/warranty-form?o=${warranty.id}`, method="post") 
                   div.field-wrapper
                      input(
-                        name='clientName',
-                        placeholder='Имя клиента',
-                        value=order.clientName
-                     )
-                  div.field-wrapper
-                     input(
-                        name='additionalPhone',
-                        placeholder='Дополнительный телефон',
-                        value=order.additionalPhone
+                        name='period',
+                        placeholder='Срок гарантии',
+                        value=warranty.period
+                        type='date'
                      )
                   div.field-wrapper
                      input(
-                        name='fullAddress',
-                        placeholder='Адрес',
-                        value=order.fullAddress
+                        name='typeOfJob',
+                        placeholder='Виды работ',
+                        value=warranty.typeOfJob
                      )
                   div.field-wrapper
                      input(
-                        name='defect',
-                        placeholder='Неисправность',
-                        value=order.defect
+                        name='sparesPrice',
+                        placeholder='Итого запчасти',
+                        type='number',
+                        step='0.01'
+                        value=warranty.sparesPrice
                      )
                   div.field-wrapper
                      input(
-                        name='brand',
-                        placeholder='Марка',
-                        value=order.brand
+                        name='workPrice',
+                        placeholder='Итого работа',
+                        type='number',
+                        step='0.01'
+                        value=warranty.workPrice
                      )
-                  div.field-wrapper
-                     input(
-                        name='model',
-                        placeholder='Модель',
-                        value=order.model
-                     )
-                  div.field-wrapper
-                     select(
-                        name='deviceTypeId',
-                        placeholder='Тип устройства',
-                        value=order.deviceTypeId
-                     )
-                        each val in deviceTypes 
-                           option(value=val.id, selected=val.id === order.deviceTypeId) #{val.title} 
                   div.submit-wrapper
                      if saved
                         div.saved-alert Сохранено

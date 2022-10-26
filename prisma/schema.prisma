@@ -152,7 +152,7 @@ model Order {
   id              Int           @id @default(autoincrement())
   clientPhone     String        @map("client_phone") @db.VarChar(64)
   clientName      String?       @map("client_name")
-  date            DateTime?
+  date            DateTime?     @db.Timestamptz(3)
   additionalPhone String?       @map("additional_phone") @db.VarChar(64)
   fullAddress     String?       @map("full_address")
   defect          String?       @db.VarChar(128)
@@ -169,6 +169,7 @@ model Order {
 
   messages OrderMessage[]
   calls    Call[]
+  warranty Warranty?
 
   @@map(name: "orders")
 }
@@ -195,7 +196,7 @@ model Call {
   id          Int      @id @default(autoincrement())
   callId      String   @unique @map("call_id") @db.VarChar(128)
   clientPhone String   @map("client_phone") @db.VarChar(128)
-  date        DateTime
+  date        DateTime @db.Timestamptz(3)
   type        String   @db.VarChar(128)
   status      String   @db.VarChar(128)
   duration    Int      @default(0)
@@ -213,4 +214,17 @@ model DeviceType {
   orders Order[]
 
   @@map(name: "device_types")
+}
+
+model Warranty {
+  id          Int      @id @default(autoincrement())
+  period      DateTime? @db.Timestamptz(3)
+  typeOfJob   String?
+  sparesPrice Decimal?  @default(0)
+  workPrice   Decimal?  @default(0)
+
+  orderId Int   @unique
+  order   Order @relation(fields: [orderId], references: [id])
+
+  @@map(name: "warranty")
 }

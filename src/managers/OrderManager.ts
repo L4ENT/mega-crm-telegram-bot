@@ -33,4 +33,8 @@ export default class OrderManager {
       data: { masterId },
     });
   }
+
+  static async getById(orderId: number) {
+    return await db.order.findUnique({ where: { id: orderId }})
+  }
 }

@@ -42,7 +42,7 @@ export async function orderMessageForDispatcher(order: Order) {
 }
 
 export async function orderMessageForMaster(order: Order) {
-  let message = 
+  let message =
     `Заявка № ${order.id}\n\n` +
     `<b>Имя клиента</b>: ${order.clientName}\n` +
     `<b>Номер телефона</b>: ${order.clientPhone}\n` +
@@ -50,7 +50,7 @@ export async function orderMessageForMaster(order: Order) {
     `<b>Адрес</b>: ${order.fullAddress}\n` +
     `<b>Неисправность</b>: ${order.defect}\n` +
     `<b>Марка</b>: ${order.brand}\n` +
-    `<b>Модель</b>: ${order.model}\n`
+    `<b>Модель</b>: ${order.model}\n`;
 
   if (order.deviceTypeId) {
     const deviceType = await db.deviceType.findUnique({
@@ -67,7 +67,7 @@ export async function orderMessageForMaster(order: Order) {
     message += `<b>Мастер</b>: ${master.fullName}\n`;
   }
 
-  return message
+  return message;
 }
 
 export function dispatcherOrderInlineKB(order: Order) {
@@ -170,4 +170,18 @@ export default function masterSelectInlineKeyboard(
     ]);
   }
   return inlineKeyboard;
+}
+
+export function masterOrderInlineKeyboard(order: Order) {
+  return [
+    [
+      {
+        text: "Выписать гарантию",
+        callback_data: JSON.stringify({
+          cmd: "order:warranty",
+          orderId: order.id,
+        }),
+      },
+    ],
+  ];
 }
