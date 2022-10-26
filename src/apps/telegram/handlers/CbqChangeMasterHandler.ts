@@ -34,5 +34,6 @@ export default class CbqChangeMasterHandler extends CbqHandler {
     const master = new MasterAgent(masterId);
 
     await dispatcherAgent.actions.changeOrderMaster(order, master);
+    await FlowsManager.exitFlow(cbq.from.id.toString(), cbq.message.chat.id.toString())
   }
 }

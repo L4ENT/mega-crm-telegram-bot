@@ -14,7 +14,6 @@ class CbqOrderCreateHandler extends CbqHandler {
     const managerAgent = new ManagerAgent();
     const cbqData = JSON.parse(cbq.data);
     const order = await OrderManager.createOrderByCallId(cbqData.callId);
-    console.log(order)
     await managerAgent.actions.getOrderFormLink(order);
   }
 }

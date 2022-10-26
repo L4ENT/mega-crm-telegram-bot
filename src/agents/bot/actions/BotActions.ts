@@ -107,6 +107,7 @@ class BotActions implements AgentActionsInterface {
       order,
       ChannelLabels.DISPATCHER
     );
+    console.log('editDispatcherOrderMessages.messages', messages)
     for (let { chatUid, messageUid } of messages) {
       const text = await orderMessageForDispatcher(order);
       await this.agent.messagerEngine.editMessage(text, messageUid, chatUid, {

@@ -40,12 +40,13 @@ export default class TelegramEngine implements MessagerEngineInterface {
     messageId: string,
     chatId: string
   ): Promise<any> {
-    return await db.orderMessage.delete({
+    console.log("removeOrderMessage", { messageId, chatId, orderId: order.id });
+    await db.orderMessage.delete({
       where: {
         orderId_chatUid_messageUid: {
           orderId: order.id,
-          chatUid: messageId,
-          messageUid: chatId,
+          chatUid: chatId,
+          messageUid: messageId,
         },
       },
     });
@@ -119,7 +120,7 @@ export default class TelegramEngine implements MessagerEngineInterface {
     opts: EditMessageTextOptions
   ): Promise<boolean | TelegramBot.Message> {
     console.log("Telegram edit message", { messageId, chatId, text });
-    
+
     let message = null;
     try {
       message = await bot.editMessageText(text, {
@@ -128,9 +129,9 @@ export default class TelegramEngine implements MessagerEngineInterface {
         chat_id: chatId,
       });
     } catch (error) {
-      console.log('Edit message probliem')
+      throw error
     }
-    return message
+    return message;
   }
 
   /**
@@ -146,6 +147,7 @@ export default class TelegramEngine implements MessagerEngineInterface {
     messageId: string,
     opts?: any
   ): Promise<boolean> {
+    console.log({ chatId, messageId, opts });
     return await bot.deleteMessage(chatId, messageId, opts);
   }
 

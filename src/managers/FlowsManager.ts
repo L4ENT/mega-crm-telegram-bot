@@ -90,7 +90,7 @@ export default class FlowsManager {
     if (dbFlow) {
       return {
         ...dbFlow,
-        data: JSON.parse(dbFlow.data),
+        data: JSON.parse(dbFlow.data  || '{}'),
       };
     } else {
       return null;
@@ -111,10 +111,21 @@ export default class FlowsManager {
     if (dbFlow) {
       return {
         ...dbFlow,
-        data: JSON.parse(dbFlow.data),
+        data: JSON.parse(dbFlow.data || '{}'),
       };
     } else {
       return null;
     }
+  }
+
+  static async exitFlow(userUid:string, chatUid: string) {
+    return await db.messagerFlow.delete({
+      where: {
+        userUid_chatUid: {
+          userUid: userUid,
+          chatUid: chatUid,
+        },
+      },
+    });
   }
 }

@@ -28,7 +28,7 @@ export default class OrderManager {
   }
 
   static async setMaster(orderId: number, masterId: number) {
-    await db.order.update({
+    return await db.order.update({
       where: { id: orderId },
       data: { masterId },
     });

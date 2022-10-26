@@ -6,6 +6,7 @@ import CbqHandlerInterface from "@src/apps/telegram/handlers/CbqHandlerInterface
 import TelegramApp from "@src/apps/telegram/TelegramApp";
 import { getTelegramMessager } from "@src/apps/telegram/utils";
 import db from "@src/db";
+import FlowsManager from "@src/managers/FlowsManager";
 import { CallbackQuery } from "node-telegram-bot-api";
 
 export default class CbqAssignMasterHandler extends CbqHandler{
@@ -33,5 +34,7 @@ export default class CbqAssignMasterHandler extends CbqHandler{
     const master = new MasterAgent(masterId)
 
     await dispatcherAgent.actions.assignOrderToMaster(order, master);
+    
+    await FlowsManager.exitFlow(cbq.from.id.toString(), cbq.message.chat.id.toString())
   }
 }

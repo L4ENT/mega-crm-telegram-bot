@@ -139,10 +139,8 @@ class BotEvents implements AgentEventsInterface {
    * @param from
    * @param to
    */
-  async onOrderMasterСhange(order: Order, from: MasterAgent, to: MasterAgent) {
-    await this.agent.actions.sendMasterOrderMessage(to, order);
-    await this.agent.actions.removeMasterOrderMessage(from, order);
-    await this.agent.actions.editDispatcherOrderMessages(order);
+  async onOrderMasterUnassign(order: Order, master: MasterAgent) {
+    await this.agent.actions.removeMasterOrderMessage(master, order);
   }
 
   /**

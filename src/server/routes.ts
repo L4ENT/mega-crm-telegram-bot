@@ -106,26 +106,25 @@ export const orderFormPage = async (
       },
     });
 
-    const managerAgent = new ManagerAgent()
+    const managerAgent = new ManagerAgent();
 
-    const messagesCount = await db.orderMessage.count({ where: {
-      orderId: order.id,
-      messagerChannel: {
-        labels: {
-          some: {
-            messagerlabelCode: ChannelLabels.DISPATCHER
-          }
-        }
-      }
-    }})
-    console.log(messagesCount)
-    if(messagesCount > 0) {
-      managerAgent.actions.updateOrder(order)
+    const messagesCount = await db.orderMessage.count({
+      where: {
+        orderId: order.id,
+        messagerChannel: {
+          labels: {
+            some: {
+              messagerlabelCode: ChannelLabels.DISPATCHER,
+            },
+          },
+        },
+      },
+    });
+    if (messagesCount > 0) {
+      managerAgent.actions.updateOrder(order);
     } else {
-      managerAgent.actions.fillOrder(order)
+      managerAgent.actions.fillOrder(order);
     }
-    
-    
   }
 
   const deviceTypes = await db.deviceType.findMany();

@@ -2,20 +2,20 @@ import { getTelegramMessager } from "@src/apps/telegram/utils";
 import db from "@src/db";
 import MessagerRepository from "@src/repository/messager-repository";
 
-
-
 async function simpleMessageMiddleware(update) {
-  console.log(update)
   const { tgUser, tgChannel, tgChat } = {
     tgUser: update?.message?.from,
-    tgChannel: ["group", "supergroup"].includes(update?.message?.chat?.type) ? update.message.chat : null,
-    tgChat: update?.message?.chat?.type == "private" ? update.message.chat : null,
+    tgChannel: ["group", "supergroup"].includes(update?.message?.chat?.type)
+      ? update.message.chat
+      : null,
+    tgChat:
+      update?.message?.chat?.type == "private" ? update.message.chat : null,
   };
-  
+
   if (!tgUser) {
     return;
   }
-  const messager = await getTelegramMessager()
+  const messager = await getTelegramMessager();
 
   const mUserRep = new MessagerRepository(db.messagerUser, messager);
   const mUser = await mUserRep.upsert({
@@ -48,10 +48,7 @@ async function simpleMessageMiddleware(update) {
   }
 
   if (tgChannel) {
-    const mChannelRep = new MessagerRepository(
-      db.messagerChannel,
-      messager
-    );
+    const mChannelRep = new MessagerRepository(db.messagerChannel, messager);
     const mChannel = await mChannelRep.upsert({
       where: {
         uid_messagerId: {
@@ -78,7 +75,7 @@ async function simpleMessageMiddleware(update) {
             },
             create: {
               messagerChannelId: mChannel.id,
-            }
+            },
           },
         },
       },

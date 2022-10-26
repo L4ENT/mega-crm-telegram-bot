@@ -11,45 +11,44 @@ export default class DispatcherActions implements AgentActionsInterface {
   }
 
   /**
-     * Поиск мастера по миени (отправляет кнопки в чат)
-     * 
-     * @param order 
-     * @param query 
-     */
-  async startAssignMasterOnOrder() {  
+   * Поиск мастера по миени (отправляет кнопки в чат)
+   *
+   * @param order
+   * @param query
+   */
+  async startAssignMasterOnOrder() {
     await this.agent.bot.events.onStartAssignMaster(this.agent);
   }
 
   /**
    * Поиск мастера по миени (отправляет кнопки в чат)
-   * 
-   * @param order 
-   * @param query 
+   *
+   * @param order
+   * @param query
    */
-  async searchForOrderMaster(order: Order, query: string) {  
+  async searchForOrderMaster(order: Order, query: string) {
     await this.agent.bot.events.onOrderMasterSearch(order, this.agent, query);
   }
 
   /**
    * Назначаем мастера на заявку
-   * 
-   * @param order 
-   * @param master 
+   *
+   * @param order
+   * @param master
    */
   async assignOrderToMaster(order: Order, master: MasterAgent) {
-    await master.events.onOrderAssign(order)
-    await this.agent.bot.events.onOrderMasterAssign(order, master)
+    await master.events.onOrderAssign(order);
   }
 
   /**
    * меняем мастера
-   * 
-   * @param order 
-   * @param newMaster 
+   *
+   * @param order
+   * @param newMaster
    */
-   async changeOrderMaster(order: Order, newMaster: MasterAgent) {
-    await newMaster.events.onOrderAssign(order)
-    const oldMaster = new MasterAgent(order.masterId)
-    await this.agent.bot.events.onOrderMasterСhange(order, oldMaster, newMaster)
+  async changeOrderMaster(order: Order, newMaster: MasterAgent) {
+    await newMaster.events.onOrderAssign(order);
+    const oldMaster = new MasterAgent(order.masterId);
+    await this.agent.bot.events.onOrderMasterUnassign(order, oldMaster);
   }
 }
