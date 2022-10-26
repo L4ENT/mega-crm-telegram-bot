@@ -216,7 +216,11 @@ export const downloadWarranty = async (
   let warranty = await db.warranty.findUnique({
     where: { id: parseInt(req.params.warrantyId) },
     include: {
-      order: true,
+      order: {
+        include: {
+          deviceType: true
+        }
+      },
     },
   });
 
@@ -230,13 +234,21 @@ export const downloadWarranty = async (
   );
 
   console.log("Before create report");
+
   const buffer = await createReport({
     template,
     data: {
-      period: moment(warranty.period).format("DD.MM.YYYY"),
+      period: 12,
       typeOfJob: warranty.typeOfJob,
       sparesPrice: warranty.sparesPrice,
       workPrice: warranty.workPrice,
+      clientAddress: warranty.order.fullAddress,
+      clientPhone: `+${warranty.order.clientPhone}`,
+      additionalPhone: warranty.order.additionalPhone,
+      total: warranty.sparesPrice.toNumber() + warranty.workPrice.toNumber(),
+      orderId: warranty.orderId,
+      warrantyDate: moment().format("DD.MM.YYYY"),
+      deviceType: warranty.order.deviceType.title
     },
   });
 
