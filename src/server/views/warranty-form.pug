@@ -28,11 +28,12 @@ html
       .field-wrapper label{
          width: 100%;
       }
-      .field-wrapper input {
+      .field-wrapper input, .field-wrapper textarea {
          border: 1px solid #c9c9c9;
          padding: 1rem;
          width: 100%;
          border-radius: 5px;
+         box-sizing: border-box;
       }
       .field-wrapper select {
          border: 1px solid #c9c9c9;
@@ -70,34 +71,39 @@ html
                   a(href=`tel:+${warranty.order.clientPhone}`) +#{warranty.order.clientPhone} 
                form(action=`/warranty-form?o=${warranty.id}`, method="post") 
                   div.field-wrapper
-                     input(
-                        name='period',
-                        placeholder='Срок гарантии',
-                        value=warranty.period
-                        type='number'
-                     )
+                     label(for="period") Срок гарантии (мес.) 
+                        input(
+                           name='period',
+                           placeholder='Введите число',
+                           value=warranty.period
+                           type='number'
+                        )
                   div.field-wrapper
-                     input(
-                        name='typeOfJob',
-                        placeholder='Виды работ',
-                        value=warranty.typeOfJob
-                     )
+                     label(for="typeOfJob") Виды работ
+                        textarea(
+                           rows="5"
+                           name='typeOfJob',
+                           placeholder='Введите текст',
+                           value=warranty.typeOfJob
+                        )
                   div.field-wrapper
-                     input(
-                        name='sparesPrice',
-                        placeholder='Итого запчасти',
-                        type='number',
-                        step='0.01'
-                        value=warranty.sparesPrice
-                     )
+                     label(for="sparesPrice") Итого за запчасти
+                        input(
+                           name='sparesPrice',
+                           placeholder='Введите сумму',
+                           type='number',
+                           step='0.01'
+                           value=warranty.sparesPrice
+                        )
                   div.field-wrapper
-                     input(
-                        name='workPrice',
-                        placeholder='Итого работа',
-                        type='number',
-                        step='0.01'
-                        value=warranty.workPrice
-                     )
+                     label(for="sparesPrice") Итого за работу
+                        input(
+                           name='workPrice',
+                           placeholder='Введите сумму',
+                           type='number',
+                           step='0.01'
+                           value=warranty.workPrice
+                        )
                   div.submit-wrapper
                      if saved
                         div.saved-alert Сохранено
