@@ -28,11 +28,12 @@ html
       .field-wrapper label{
          width: 100%;
       }
-      .field-wrapper input {
+      .field-wrapper input, .field-wrapper textarea {
          border: 1px solid #c9c9c9;
          padding: 1rem;
          width: 100%;
          border-radius: 5px;
+         box-sizing: border-box;
       }
       .field-wrapper select {
          border: 1px solid #c9c9c9;
@@ -66,51 +67,60 @@ html
                h2 Заявка #КБТ#{order.id} 
                p Номер клиента:
                   a(href=`tel:+${order.clientPhone}`) +#{order.clientPhone} 
-               form(action=`/order-form?t=${order.id}`, method="post") 
+               form(action=`/order-form?t=${order.id}`, method="post")
+                  
                   div.field-wrapper
-                     input(
-                        name='clientName',
-                        placeholder='Имя клиента',
-                        value=order.clientName
-                     )
+                     label(for="clientName") Имя клиента
+                        input(
+                           name='clientName',
+                           placeholder='Введите текст',
+                           value=order.clientName
+                        )
                   div.field-wrapper
-                     input(
-                        name='additionalPhone',
-                        placeholder='Дополнительный телефон',
-                        value=order.additionalPhone
-                     )
+                     label(for="additionalPhone") Дополнительный телефон
+                        input(
+                           name='additionalPhone',
+                           placeholder='Введите номер',
+                           value=order.additionalPhone
+                        )
                   div.field-wrapper
-                     input(
-                        name='fullAddress',
-                        placeholder='Адрес',
-                        value=order.fullAddress
-                     )
+                     label(for="fullAddress") Адрес
+                        textarea(
+                           rows="7"
+                           name='fullAddress',
+                           placeholder='Введите текст',
+                           value=order.fullAddress
+                        )
                   div.field-wrapper
-                     input(
-                        name='defect',
-                        placeholder='Неисправность',
-                        value=order.defect
-                     )
+                     label(for="defect") Неисправность
+                        input(
+                           name='defect',
+                           placeholder='Введите текст',
+                           value=order.defect
+                        )
                   div.field-wrapper
-                     input(
-                        name='brand',
-                        placeholder='Марка',
-                        value=order.brand
-                     )
+                     label(for="brand") Марка
+                        input(
+                           name='brand',
+                           placeholder='Введите текст',
+                           value=order.brand
+                        )
                   div.field-wrapper
-                     input(
-                        name='model',
-                        placeholder='Модель',
-                        value=order.model
-                     )
+                     label(for="model") Модель
+                        input(
+                           name='model',
+                           placeholder='Введите текст',
+                           value=order.model
+                        )
                   div.field-wrapper
-                     select(
-                        name='deviceTypeId',
-                        placeholder='Тип устройства',
-                        value=order.deviceTypeId
-                     )
-                        each val in deviceTypes 
-                           option(value=val.id, selected=val.id === order.deviceTypeId) #{val.title} 
+                     label(for="deviceTypeId") Тип устройства
+                        select(
+                           name='deviceTypeId',
+                           placeholder='Выберите из списка',
+                           value=order.deviceTypeId
+                        )
+                           each val in deviceTypes 
+                              option(value=val.id, selected=val.id === order.deviceTypeId) #{val.title} 
                   div.submit-wrapper
                      if saved
                         div.saved-alert Сохранено
