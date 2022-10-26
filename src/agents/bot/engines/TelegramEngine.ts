@@ -394,27 +394,41 @@ export default class TelegramEngine implements MessagerEngineInterface {
     });
   }
 
-  async sendWarrantyFormLink(chatId: string | number, warranty: Warranty): Promise<any> {
-    const link = `${config.PUBLIC_URL}/warranty-form?o=${warranty.id}`
+  async sendWarrantyFormLink(
+    chatId: string | number,
+    warranty: Warranty
+  ): Promise<any> {
+    const link = `${config.PUBLIC_URL}/warranty-form?o=${warranty.id}`;
 
-    const message = (
-      `Пожалуйста заполните данные гарантии\n` +
-      `<a href="${link}">Ссылка на форму</a>`
-    )
+    const message =
+      `Заявка №${warranty.orderId}. Пожалуйста заполните данные гарантии\n` +
+      `<a href="${link}">Ссылка на форму</a>`;
     await this.sendMessage(chatId, message, {
-      parse_mode: "HTML"
-    })
+      parse_mode: "HTML",
+    });
   }
 
   async sendWarranty(chatId: string | number, warranty: Warranty) {
-    const link = WarrantyManager.getDownloadLink(warranty.id)
+    const link = WarrantyManager.getDownloadLink(warranty.id);
 
-    const message = (
+    const message =
       `Гарантия на заявку №${warranty.orderId}\n` +
-      `<a href="${link}">Скачать гарантию</a>`
-    )
+      `<a href="${link}">Скачать гарантию</a>`;
     await this.sendMessage(chatId, message, {
-      parse_mode: "HTML"
-    })
+      parse_mode: "HTML",
+    });
+  }
+
+  async sendWarrantyToDebet(
+    chatId: string | number,
+    warranty: Warranty
+  ): Promise<any> {
+    const message =
+      `Гарантия на заявку №${warranty.orderId}\n` +
+      `<b> Итого за запчасти </b>: ${warranty.sparesPrice} руб.\n` +
+      `<b> Итого за работу </b>: ${warranty.sparesPrice} руб.\n`;
+    await this.sendMessage(chatId, message, {
+      parse_mode: "HTML",
+    });
   }
 }

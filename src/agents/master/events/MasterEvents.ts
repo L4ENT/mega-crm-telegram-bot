@@ -2,6 +2,7 @@ import { Order, Warranty } from "@prisma/client";
 import AgentEventsInterface from "@src/agents/AgentEventsInterface";
 import MasterAgent from "@src/agents/master/MasterAgent";
 import OrderManager from "@src/managers/OrderManager";
+import WhatsappManager from "@src/managers/WhatsappManager";
 
 class MasterEvents implements AgentEventsInterface {
   agent: MasterAgent;
@@ -26,12 +27,19 @@ class MasterEvents implements AgentEventsInterface {
     await this.agent.bot.events.onOrderMasterAssign(updatedOrder, this.agent);
   }
 
-  async onWarrantyCreated(warranty: Warranty){
-    await this.agent.bot.events.onWarrantyCreated(this.agent, warranty)
+  async onWarrantyCreated(warranty: Warranty) {
+    await this.agent.bot.events.onWarrantyCreated(this.agent, warranty);
   }
 
-  async onWarrantyIssued(warranty: Warranty){
-    await this.agent.bot.events.onWarrantyIssued(this.agent, warranty)
+  async onWarrantyIssued(warranty: Warranty) {
+    await this.agent.bot.events.onWarrantyIssued(this.agent, warranty);
+
+    const order = await OrderManager.getById(warranty.orderId);
+    try {
+      await WhatsappManager.sendWarranty(warranty, order.clientPhone);
+    } catch (error) {
+      // throw error;
+    }
   }
 }
 

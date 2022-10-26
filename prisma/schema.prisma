@@ -25,6 +25,7 @@ model User {
 
   messagerUsers MessagerUser[]
   orders        Order[]
+  DeviceType    DeviceType[]
 
   @@map(name: "users")
 }
@@ -213,11 +214,14 @@ model DeviceType {
   title  String  @db.VarChar(128)
   orders Order[]
 
+  defaultMasterId Int?
+  defaultMaster   User? @relation(fields: [defaultMasterId], references: [id])
+
   @@map(name: "device_types")
 }
 
 model Warranty {
-  id          Int      @id @default(autoincrement())
+  id          Int       @id @default(autoincrement())
   period      DateTime? @db.Timestamptz(3)
   typeOfJob   String?
   sparesPrice Decimal?  @default(0)

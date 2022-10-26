@@ -6,6 +6,7 @@ const ChannelLabels = {
     CALLS_SERVICE: "CALLS_SERVICE",
     DISPATCHER: "DISPATCHER",
     MASTER: "MASTER",
+    DEBET: "DEBET",
 }
 
 export default ChannelLabels

@@ -107,7 +107,7 @@ class BotActions implements AgentActionsInterface {
       order,
       ChannelLabels.DISPATCHER
     );
-    console.log('editDispatcherOrderMessages.messages', messages)
+    console.log("editDispatcherOrderMessages.messages", messages);
     for (let { chatUid, messageUid } of messages) {
       const text = await orderMessageForDispatcher(order);
       await this.agent.messagerEngine.editMessage(text, messageUid, chatUid, {
@@ -145,7 +145,11 @@ class BotActions implements AgentActionsInterface {
       ChannelLabels.MASTER
     );
     for (let { chatUid, messageUid } of messages) {
-      await this.agent.messagerEngine.editOrderMasterMessage(chatUid, messageUid, order)
+      await this.agent.messagerEngine.editOrderMasterMessage(
+        chatUid,
+        messageUid,
+        order
+      );
     }
   }
 
@@ -166,26 +170,40 @@ class BotActions implements AgentActionsInterface {
     );
   }
 
-   /**
+  /**
    * Отправляем ссыдку на форму с гарантией
    *
    * @param master
    * @param warranty
    */
-    async sendWarrantyFormLink(master: MasterAgent, warranty: Warranty) {
-      const chatId = await this.agent.messagerEngine.getChatIdByAgent(master)
-      await this.agent.messagerEngine.sendWarrantyFormLink(chatId, warranty)
-    }
+  async sendWarrantyFormLink(master: MasterAgent, warranty: Warranty) {
+    const chatId = await this.agent.messagerEngine.getChatIdByAgent(master);
+    await this.agent.messagerEngine.sendWarrantyFormLink(chatId, warranty);
+  }
 
-    /**
+  /**
    * Отправляем мастеру гарантию
    *
    * @param master
    * @param warranty
    */
-     async sendWarrantyToMaster(master: MasterAgent, warranty: Warranty) {
-      const chatId = await this.agent.messagerEngine.getChatIdByAgent(master)
-      await this.agent.messagerEngine.sendWarranty(chatId, warranty)
+  async sendWarrantyToMaster(master: MasterAgent, warranty: Warranty) {
+    const chatId = await this.agent.messagerEngine.getChatIdByAgent(master);
+    await this.agent.messagerEngine.sendWarranty(chatId, warranty);
+  }
+  /**
+   * Отправляем мастеру гарантию
+   *
+   * @param master
+   * @param warranty
+   */
+  async sendWarrantyToDebetChannel(warranty: Warranty) {
+    const chatIds = await this.agent.messagerEngine.getChannelIdsByLabel(
+      ChannelLabels.DEBET
+    );
+    for (let chatId of chatIds) {
+      await this.agent.messagerEngine.sendWarrantyToDebet(chatId, warranty);
     }
+  }
 }
 export default BotActions;

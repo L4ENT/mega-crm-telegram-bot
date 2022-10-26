@@ -45,6 +45,7 @@ interface MessagerEngineInterface {
   ): Promise<any>;
   sendWarrantyFormLink(chatId: string | number, warranty: Warranty): Promise<any>
   sendWarranty(chatId: string | number, warranty: Warranty): Promise<any>
+  sendWarrantyToDebet(chatId: string | number, warranty: Warranty): Promise<any>
 }
 
 export default MessagerEngineInterface;

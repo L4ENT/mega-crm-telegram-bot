@@ -8,9 +8,17 @@ export default class MasterManager {
       where: {
         fullName: {
           contains: query,
+          mode: "insensitive",
         },
       },
     });
     return users.map((user: User) => new MasterAgent(user.id));
+  }
+
+  static async getDefaultMaster(deviceTypeId: number) {
+    const deviceType = await db.deviceType.findUnique({
+      where: { id: deviceTypeId },
+    });
+    return deviceType.defaultMasterId
   }
 }

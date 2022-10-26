@@ -170,7 +170,8 @@ class BotEvents implements AgentEventsInterface {
    * @param warranty
    */
     async onWarrantyIssued(master: MasterAgent, warranty: Warranty) {
-      this.agent.actions.sendWarrantyToMaster(master, warranty);
+      await this.agent.actions.sendWarrantyToMaster(master, warranty);
+      await this.agent.actions.sendWarrantyToDebetChannel(warranty)
     }
 }
 

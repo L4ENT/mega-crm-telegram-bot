@@ -1,5 +1,6 @@
 import { Call, Order } from "@prisma/client";
 import db from "@src/db";
+import moment = require("moment");
 
 export default class OrderManager {
   static async createOrderByCallId(callId: string) {
@@ -36,5 +37,16 @@ export default class OrderManager {
 
   static async getById(orderId: number) {
     return await db.order.findUnique({ where: { id: orderId }})
+  }
+
+  static async getUnassignedOrders(): Promise<Order[]> {
+    const _20minutesAgo = moment().add(-20, 'minute').toDate()
+    const orders = await db.order.findMany({ where: { 
+      masterId: null,
+      updatedAt: {
+        lte: _20minutesAgo
+      }
+    }})
+    return orders
   }
 }
