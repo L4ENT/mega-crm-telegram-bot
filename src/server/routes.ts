@@ -130,7 +130,7 @@ export const orderFormPage = async (
       managerAgent.actions.fillOrder(order);
     }
 
-    submited = true
+    submited = true;
   }
 
   const deviceTypes = await db.deviceType.findMany();
@@ -176,6 +176,7 @@ export const warrantyFormPage = async (
         typeOfJob: req.body.typeOfJob,
         sparesPrice: parseFloat(req.body.sparesPrice),
         workPrice: parseFloat(req.body.workPrice),
+        date: moment(req.body.date).toDate()
       },
       include: {
         order: true,
@@ -183,13 +184,18 @@ export const warrantyFormPage = async (
     });
 
     const masterAgent = new MasterAgent(warranty.order.masterId);
-    await masterAgent.events.onWarrantyIssued(warranty)
+    await masterAgent.events.onWarrantyIssued(warranty);
 
     submited = true;
   }
 
+  const warrantyDateMoment = warranty.date ? moment(warranty.date) : moment();
+  
   res.render("warranty-form", {
-    warranty,
+    warranty: {
+      ...warranty,
+      date: warrantyDateMoment.format("YYYY-MM-DD") 
+    },
     warrantyLink: WarrantyManager.getDownloadLink(warranty.id),
     submited,
   });
@@ -215,8 +221,8 @@ export const downloadWarranty = async (
     include: {
       order: {
         include: {
-          deviceType: true
-        }
+          deviceType: true,
+        },
       },
     },
   });
@@ -232,6 +238,8 @@ export const downloadWarranty = async (
 
   console.log("Before create report");
 
+  const warrantyDateMoment = warranty.date ? moment(warranty.date) : moment();
+
   const buffer = await createReport({
     template,
     data: {
@@ -244,8 +252,8 @@ export const downloadWarranty = async (
       additionalPhone: warranty.order.additionalPhone,
       total: warranty.sparesPrice.toNumber() + warranty.workPrice.toNumber(),
       orderId: warranty.orderId,
-      warrantyDate: moment().format("DD.MM.YYYY"),
-      deviceType: warranty.order.deviceType.title
+      warrantyDate: warrantyDateMoment.format("DD.MM.YYYY"),
+      deviceType: warranty.order.deviceType.title,
     },
   });
 

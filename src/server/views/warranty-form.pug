@@ -79,6 +79,14 @@ html
                            type='number'
                         )
                   div.field-wrapper
+                     label(for="date") Дата
+                        input(
+                           name='date',
+                           placeholder='Выберите дату',
+                           value=warranty.date
+                           type='date'
+                        )
+                  div.field-wrapper
                      label(for="typeOfJob") Виды работ
                         textarea(
                            rows="5"

@@ -226,6 +226,7 @@ model Warranty {
   typeOfJob   String?
   sparesPrice Decimal?  @default(0)
   workPrice   Decimal?  @default(0)
+  date        DateTime? @db.Timestamptz(3)
 
   orderId Int   @unique
   order   Order @relation(fields: [orderId], references: [id])
