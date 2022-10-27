@@ -87,7 +87,7 @@ class BotActions implements AgentActionsInterface {
 
     const users = await db.user.findMany({
       where: {
-        id: { in: masters.map((m: MasterAgent) => m.identity).map(parseInt) },
+        id: { in: masters.map((m: MasterAgent) => parseInt(m.identity)) },
       },
     });
     await this.agent.messagerEngine.sendOrderMasterButtons(
