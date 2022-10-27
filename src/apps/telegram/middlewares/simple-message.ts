@@ -20,10 +20,10 @@ async function simpleMessageMiddleware(update) {
   const mUserRep = new MessagerRepository(db.messagerUser, messager);
   const mUser = await mUserRep.upsert({
     where: {
-      uid_messagerId: { uid: tgUser.username, messagerId: messager.id },
+      uid_messagerId: { uid: tgUser.id.toString(), messagerId: messager.id },
     },
     create: {
-      uid: tgUser.username,
+      uid: tgUser.id.toString(),
       user: { create: { username: tgUser.username } },
     },
   });
