@@ -160,14 +160,20 @@ class BotActions implements AgentActionsInterface {
    * @param order
    */
   async removeMasterOrderMessage(master: MasterAgent, order: Order) {
-    const { channelId, messageId } =
-      await this.agent.messagerEngine.getOrderMessageByAgent(master, order);
-    await this.agent.messagerEngine.deleteMessage(channelId, messageId);
-    await this.agent.messagerEngine.removeOrderMessage(
-      order,
-      messageId,
-      channelId
+    const message = await this.agent.messagerEngine.getOrderMessageByAgent(
+      master,
+      order
     );
+
+    if (message) {
+      const { channelId, messageId } = message;
+      await this.agent.messagerEngine.deleteMessage(channelId, messageId);
+      await this.agent.messagerEngine.removeOrderMessage(
+        order,
+        messageId,
+        channelId
+      );
+    }
   }
 
   /**

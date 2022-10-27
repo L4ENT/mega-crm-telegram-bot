@@ -225,6 +225,10 @@ export default class TelegramEngine implements MessagerEngineInterface {
       },
     });
 
+    if (!message) {
+      return null
+    }
+
     return {
       messageId: message.messageUid,
       channelId: message.chatUid,
