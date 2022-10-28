@@ -16,7 +16,7 @@ export default class CbqStartChangeMasterHandler extends CbqHandler{
     const user = await db.messagerUser.findUnique({
       where: {
         uid_messagerId: {
-          uid: cbq.from.username.toString(),
+          uid: cbq.from.id.toString(),
           messagerId: messager.id,
         },
       },

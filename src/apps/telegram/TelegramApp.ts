@@ -84,6 +84,9 @@ class TelegramApp {
   }
 
   async processUpdate(update: Update) {
+
+    console.log(update)
+
     for (let mw of this.miidlewares) {
       await mw(update);
     }

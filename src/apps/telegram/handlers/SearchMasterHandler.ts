@@ -18,7 +18,7 @@ class SearchMasterHandler extends MessageHandler {
     const user = await db.messagerUser.findUnique({
       where: {
         uid_messagerId: {
-          uid: msg.from.username.toString(),
+          uid: msg.from.id.toString(),
           messagerId: messager.id,
         },
       },

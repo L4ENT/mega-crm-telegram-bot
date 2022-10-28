@@ -53,7 +53,9 @@ model MessagerUser {
   userId Int
   user   User @relation(fields: [userId], references: [id], onDelete: SetNull)
 
-  uid String @db.VarChar(256)
+  uid      String  @db.VarChar(256)
+  fullName String? @map("full_name")
+  username String? 
 
   channels MessagerUserChannel[]
   chats    MessagerChat[]

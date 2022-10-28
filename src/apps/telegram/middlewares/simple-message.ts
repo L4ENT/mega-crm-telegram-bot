@@ -1,16 +1,17 @@
 import { getTelegramMessager } from "@src/apps/telegram/utils";
 import db from "@src/db";
 import MessagerRepository from "@src/repository/messager-repository";
+import { Update, User } from "node-telegram-bot-api";
 
-async function simpleMessageMiddleware(update) {
-  const { tgUser, tgChannel, tgChat } = {
-    tgUser: update?.message?.from,
-    tgChannel: ["group", "supergroup"].includes(update?.message?.chat?.type)
-      ? update.message.chat
-      : null,
-    tgChat:
-      update?.message?.chat?.type == "private" ? update.message.chat : null,
-  };
+async function simpleMessageMiddleware(update: Update) {
+  const tgUser: User = update?.message?.from || null;
+  const tgChannel = ["group", "supergroup"].includes(
+    update?.message?.chat?.type
+  )
+    ? update.message.chat
+    : null;
+  const tgChat =
+    update?.message?.chat?.type == "private" ? update.message.chat : null;
 
   if (!tgUser) {
     return;
@@ -20,12 +21,18 @@ async function simpleMessageMiddleware(update) {
   const mUserRep = new MessagerRepository(db.messagerUser, messager);
   const mUser = await mUserRep.upsert({
     where: {
-      uid_messagerId: { uid: tgUser.username, messagerId: messager.id },
+      uid_messagerId: { uid: tgUser.id.toString(), messagerId: messager.id },
     },
     create: {
-      uid: tgUser.username,
-      user: { create: { username: tgUser.username } },
+      uid: tgUser.id.toString(),
+      user: { create: { username: tgUser.id.toString() } },
+      username: tgUser.username,
+      fullName: tgUser.first_name + (tgUser.last_name ? ` ${tgUser.last_name}` : '')
     },
+    update: {
+      username: tgUser.username,
+      fullName: tgUser.first_name + (tgUser.last_name ? ` ${tgUser.last_name}` : '')
+    }
   });
   if (tgChat) {
     const mChatRep = new MessagerRepository(db.messagerChat, messager);
@@ -62,7 +69,7 @@ async function simpleMessageMiddleware(update) {
 
     await mUserRep.update({
       where: {
-        uid_messagerId: { uid: tgUser.username, messagerId: messager.id },
+        uid_messagerId: { uid: tgUser.id.toString(), messagerId: messager.id },
       },
       data: {
         channels: {

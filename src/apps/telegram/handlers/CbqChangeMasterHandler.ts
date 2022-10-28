@@ -2,7 +2,6 @@ import DispatcherAgent from "@src/agents/dispatcher/DispatcherAgent";
 import MasterAgent from "@src/agents/master/MasterAgent";
 import ChangeMasterFlow from "@src/apps/telegram/flows/ChangeMasterFlow";
 import CbqHandler from "@src/apps/telegram/handlers/CbqHandler";
-import CbqHandlerInterface from "@src/apps/telegram/handlers/CbqHandlerInterface";
 import TelegramApp from "@src/apps/telegram/TelegramApp";
 import { getTelegramMessager } from "@src/apps/telegram/utils";
 import db from "@src/db";
@@ -18,7 +17,7 @@ export default class CbqChangeMasterHandler extends CbqHandler {
     const user = await db.messagerUser.findUnique({
       where: {
         uid_messagerId: {
-          uid: cbq.from.username.toString(),
+          uid: cbq.from.id.toString(),
           messagerId: messager.id,
         },
       },
