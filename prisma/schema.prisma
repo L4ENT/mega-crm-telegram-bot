@@ -216,7 +216,7 @@ model DeviceType {
   title  String  @db.VarChar(128)
   orders Order[]
 
-  defaultMasterId Int?
+  defaultMasterId Int? @map("default_master_id")
   defaultMaster   User? @relation(fields: [defaultMasterId], references: [id])
 
   @@map(name: "device_types")
