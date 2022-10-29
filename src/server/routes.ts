@@ -26,7 +26,7 @@ export const callsEntry = async (
     body.status.toUpperCase(),
     body.phone,
     moment(body.start).toDate(),
-    body.duration,
+    parseInt(body.duration),
     body.callid,
     body.link
   );
