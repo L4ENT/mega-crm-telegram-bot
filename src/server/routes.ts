@@ -20,20 +20,25 @@ export const callsEntry = async (
   res: import("express").Response
 ) => {
   const { body } = req;
-  console.log('Call Entry:', body)
-  const dto = new CallDto(
-    body.type.toUpperCase(),
-    body.status.toUpperCase(),
-    body.phone,
-    moment(body.start).toDate(),
-    parseInt(body.duration),
-    body.callid,
-    body.link
-  );
 
-  const teAgent = new TeAgent();
-  await teAgent.events.onNewCall(dto);
-  res.status(200).json({});
+  if (body.cmd && body.cmd == "history") {
+    const dto = new CallDto(
+      body.type.toUpperCase(),
+      body.status.toUpperCase(),
+      body.phone,
+      moment(body.start).toDate(),
+      parseInt(body.duration),
+      body.callid,
+      body.link
+    );
+
+    const teAgent = new TeAgent();
+    await teAgent.events.onNewCall(dto);
+    res.status(200).json({});
+  } else {
+    console.log("Not History:", body);
+    res.status(200).json({});
+  }
 };
 
 /**
@@ -176,7 +181,7 @@ export const warrantyFormPage = async (
         typeOfJob: req.body.typeOfJob,
         sparesPrice: parseFloat(req.body.sparesPrice),
         workPrice: parseFloat(req.body.workPrice),
-        date: moment(req.body.date).toDate()
+        date: moment(req.body.date).toDate(),
       },
       include: {
         order: true,
@@ -190,11 +195,11 @@ export const warrantyFormPage = async (
   }
 
   const warrantyDateMoment = warranty.date ? moment(warranty.date) : moment();
-  
+
   res.render("warranty-form", {
     warranty: {
       ...warranty,
-      date: warrantyDateMoment.format("YYYY-MM-DD") 
+      date: warrantyDateMoment.format("YYYY-MM-DD"),
     },
     warrantyLink: WarrantyManager.getDownloadLink(warranty.id),
     submited,
