@@ -40,38 +40,30 @@ class BotEvents implements AgentEventsInterface {
    * @param callIdenty
    */
   async onCallIdent(call: Call, callIdenty: string) {
-    if (callIdenty === CallIdenties.ORDER) {
-      await this.agent.actions.sendOutCallMessage(call);
-    } else {
-      let chatIds = [];
-      if (callIdenty === CallIdenties.SALES) {
-        chatIds = await this.agent.messagerEngine.getChannelIdsByLabel(
-          ChannelLabels.CALLS_SALES
-        );
-      }
-      if (callIdenty === CallIdenties.SPAM) {
-        chatIds = await this.agent.messagerEngine.getChannelIdsByLabel(
-          ChannelLabels.CALLS_SPAM
-        );
-      }
-      if (callIdenty === CallIdenties.PAYOUT) {
-        chatIds = await this.agent.messagerEngine.getChannelIdsByLabel(
-          ChannelLabels.CALLS_PAYOUT
-        );
-      }
-      if (callIdenty === CallIdenties.SERVICE) {
-        chatIds = await this.agent.messagerEngine.getChannelIdsByLabel(
-          ChannelLabels.CALLS_SERVICE
-        );
-      }
+    let chatIds = [];
+    if (callIdenty === CallIdenties.SALES) {
+      chatIds = await this.agent.messagerEngine.getChannelIdsByLabel(
+        ChannelLabels.CALLS_SALES
+      );
+    }
+    if (callIdenty === CallIdenties.SPAM) {
+      chatIds = await this.agent.messagerEngine.getChannelIdsByLabel(
+        ChannelLabels.CALLS_SPAM
+      );
+    }
+    if (callIdenty === CallIdenties.PAYOUT) {
+      chatIds = await this.agent.messagerEngine.getChannelIdsByLabel(
+        ChannelLabels.CALLS_PAYOUT
+      );
+    }
+    if (callIdenty === CallIdenties.SERVICE) {
+      chatIds = await this.agent.messagerEngine.getChannelIdsByLabel(
+        ChannelLabels.CALLS_SERVICE
+      );
+    }
 
-      for (let chatId of chatIds) {
-        // TODO: Implement text of message
-        await this.agent.messagerEngine.sendMessage(
-          chatId,
-          "Call for Identy chat"
-        );
-      }
+    for (let chatId of chatIds) {
+      await this.agent.actions.sendIndentyCallMessage(call, chatId);
     }
   }
 
@@ -91,8 +83,6 @@ class BotEvents implements AgentEventsInterface {
    * @param agent
    */
   async onStartAssignMaster(agent: DispatcherAgent) {
-    // TODO: отправляем сообщение мол введите имя мастера
-
     const chatId = await this.agent.messagerEngine.getChatIdByAgent(agent);
 
     await this.agent.messagerEngine.sendMessage(
@@ -163,16 +153,16 @@ class BotEvents implements AgentEventsInterface {
     this.agent.actions.sendWarrantyFormLink(master, warranty);
   }
 
-   /**
+  /**
    * Гарантия выпущена. Закидываем ее в ТГ мастеру, в канал DEPOSIT и клиенту
    *
    * @param master
    * @param warranty
    */
-    async onWarrantyIssued(master: MasterAgent, warranty: Warranty) {
-      await this.agent.actions.sendWarrantyToMaster(master, warranty);
-      await this.agent.actions.sendWarrantyToDebetChannel(warranty)
-    }
+  async onWarrantyIssued(master: MasterAgent, warranty: Warranty) {
+    await this.agent.actions.sendWarrantyToMaster(master, warranty);
+    await this.agent.actions.sendWarrantyToDebetChannel(warranty);
+  }
 }
 
 export default BotEvents;

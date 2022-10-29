@@ -226,7 +226,7 @@ export default class TelegramEngine implements MessagerEngineInterface {
     });
 
     if (!message) {
-      return null
+      return null;
     }
 
     return {
@@ -264,7 +264,6 @@ export default class TelegramEngine implements MessagerEngineInterface {
    * @returns
    */
   async getChannelIdsByLabel(label: string): Promise<any> {
-    // TODO Fix duplicate
     const channels = await db.messagerChannel.findMany({
       where: {
         labels: {
@@ -395,6 +394,16 @@ export default class TelegramEngine implements MessagerEngineInterface {
       reply_markup: {
         inline_keyboard: inlineKeyboard,
       },
+    });
+  }
+
+  async sendCallWithoutButtons(
+    chatId: string,
+    call: Call
+  ): Promise<TelegramBot.Message> {
+    const message = callMessage(call);
+    return await bot.sendMessage(chatId, message, {
+      parse_mode: "HTML",
     });
   }
 

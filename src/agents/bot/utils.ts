@@ -99,7 +99,7 @@ export function dispatcherOrderInlineKB(order: Order) {
 export function callMessage(call: Call) {
   return (
     `${call.type === CallTypes.IN ? "Входящий" : "Исходящий"} звонок\n` +
-    `${call.status} звонок\n\n` +
+    `${call.status}\n\n` +
     `<b>Поступил</b>: ${moment(call.date).format("DD.MM.YYYY hh:mm:ss")}\n` +
     `#СВЯЗЬ${call.clientPhone}\n` +
     `<b>Номер</b>: ${call.clientPhone}\n` +
@@ -124,12 +124,14 @@ export function callMessagerInlineKeyboard(callId) {
         text: "Продажи",
         callback_data: JSON.stringify({
           cmd: "call:sales",
+          callId,
         }),
       },
       {
         text: "Спам",
         callback_data: JSON.stringify({
           cmd: "call:spam",
+          callId,
         }),
       },
     ],
@@ -138,12 +140,14 @@ export function callMessagerInlineKeyboard(callId) {
         text: "Выкуп",
         callback_data: JSON.stringify({
           cmd: "call:payout",
+          callId,
         }),
       },
       {
         text: "Сервис",
         callback_data: JSON.stringify({
           cmd: "call:service",
+          callId,
         }),
       },
     ],

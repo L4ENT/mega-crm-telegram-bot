@@ -30,8 +30,19 @@ class BotActions implements AgentActionsInterface {
     );
 
     for (let chatId of chatIds) {
-      this.agent.messagerEngine.sendCallAndButtons(chatId, call);
+      await this.agent.messagerEngine.sendCallAndButtons(chatId, call);
     }
+  }
+
+  /**
+   * Отправляем сообщение о звонке в один из дополнительных
+   * каналов для звонков
+   *
+   * @param call
+   * @param chatId
+   */
+  async sendIndentyCallMessage(call: Call, chatId: string) {
+    await this.agent.messagerEngine.sendCallWithoutButtons(chatId, call);
   }
 
   /**

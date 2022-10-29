@@ -13,6 +13,7 @@ import BaseFlow from "@src/apps/telegram/flows/BaseFlow";
 import ChangeMasterFlow from "@src/apps/telegram/flows/ChangeMasterFlow";
 import CbqStartChangeMasterHandler from "@src/apps/telegram/handlers/CbqStartChangeMasterHandler";
 import CbqMakeWarrantyHandler from "@src/apps/telegram/handlers/CbqMakeWarrantyHandler";
+import CbqIdentyCall from "@src/apps/telegram/handlers/CbqIdentyCall";
 
 const router = new Router();
 
@@ -77,6 +78,18 @@ router.addCbqRoute((cbq: CallbackQuery, flow: BaseFlow) => {
   return JSON.parse(cbq.data).cmd === "order:warranty";
 }, CbqMakeWarrantyHandler);
 
+/**
+ * CBQ когда меняем мастера
+ */
+router.addCbqRoute((cbq: CallbackQuery, flow: BaseFlow) => {
+  if (JSON.parse(cbq.data).cmd) {
+    return ["call:sales", "call:spam", "call:payout", "call:service"].includes(
+      JSON.parse(cbq.data).cmd
+    );
+  }
+  return false;
+}, CbqIdentyCall);
+
 class TelegramApp {
   miidlewares: ((update: any) => Promise<any>)[];
   constructor() {
@@ -84,8 +97,7 @@ class TelegramApp {
   }
 
   async processUpdate(update: Update) {
-
-    console.log(update)
+    console.log(update);
 
     for (let mw of this.miidlewares) {
       await mw(update);

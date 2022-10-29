@@ -29,6 +29,7 @@ interface MessagerEngineInterface {
     users: User[]
   ): Promise<any>;
   sendCallAndButtons(chatId: string, call: Call): Promise<any>;
+  sendCallWithoutButtons(chatId: string, call: Call): Promise<any>;
   sendOrderDispatcherMessage(chatId: string, order: Order): Promise<any>;
   sendOrderMasterMessage(chatId: string | number, order: Order): Promise<any>;
   editOrderMasterMessage(
@@ -43,9 +44,15 @@ interface MessagerEngineInterface {
     messageId: string,
     chatId: string
   ): Promise<any>;
-  sendWarrantyFormLink(chatId: string | number, warranty: Warranty): Promise<any>
-  sendWarranty(chatId: string | number, warranty: Warranty): Promise<any>
-  sendWarrantyToDebet(chatId: string | number, warranty: Warranty): Promise<any>
+  sendWarrantyFormLink(
+    chatId: string | number,
+    warranty: Warranty
+  ): Promise<any>;
+  sendWarranty(chatId: string | number, warranty: Warranty): Promise<any>;
+  sendWarrantyToDebet(
+    chatId: string | number,
+    warranty: Warranty
+  ): Promise<any>;
 }
 
 export default MessagerEngineInterface;

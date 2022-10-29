@@ -1,4 +1,4 @@
-import { Order } from "@prisma/client";
+import { Call, Order } from "@prisma/client";
 import AgentActionsInterface from "@src/agents/AgentActionsInterface";
 import DispatcherAgent from "@src/agents/dispatcher/DispatcherAgent";
 import MasterAgent from "@src/agents/master/MasterAgent";
@@ -41,7 +41,7 @@ export default class DispatcherActions implements AgentActionsInterface {
   }
 
   /**
-   * меняем мастера
+   * Меняем мастера
    *
    * @param order
    * @param newMaster
@@ -50,5 +50,15 @@ export default class DispatcherActions implements AgentActionsInterface {
     await newMaster.events.onOrderAssign(order);
     const oldMaster = new MasterAgent(order.masterId);
     await this.agent.bot.events.onOrderMasterUnassign(order, oldMaster);
+  }
+
+  /**
+   * Отсправляем звонок в в отдельный чат
+   *
+   * @param call
+   * @param callIdenty
+   */
+  async identyCall(call: Call, callIdenty: string) {
+    await this.agent.bot.events.onCallIdent(call, callIdenty);
   }
 }
