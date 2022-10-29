@@ -5,11 +5,8 @@ import { Update, User } from "node-telegram-bot-api";
 
 async function simpleMessageMiddleware(update: Update) {
   const tgUser: User = update?.message?.from || null;
-  const tgChannel = ["group", "supergroup"].includes(
-    update?.message?.chat?.type
-  )
-    ? update.message.chat
-    : null;
+  const tgChannel =
+    update?.message?.chat?.type == "supergroup" ? update.message.chat : null;
   const tgChat =
     update?.message?.chat?.type == "private" ? update.message.chat : null;
 
@@ -27,12 +24,14 @@ async function simpleMessageMiddleware(update: Update) {
       uid: tgUser.id.toString(),
       user: { create: { username: tgUser.id.toString() } },
       username: tgUser.username,
-      fullName: tgUser.first_name + (tgUser.last_name ? ` ${tgUser.last_name}` : '')
+      fullName:
+        tgUser.first_name + (tgUser.last_name ? ` ${tgUser.last_name}` : ""),
     },
     update: {
       username: tgUser.username,
-      fullName: tgUser.first_name + (tgUser.last_name ? ` ${tgUser.last_name}` : '')
-    }
+      fullName:
+        tgUser.first_name + (tgUser.last_name ? ` ${tgUser.last_name}` : ""),
+    },
   });
   if (tgChat) {
     const mChatRep = new MessagerRepository(db.messagerChat, messager);
