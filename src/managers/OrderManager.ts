@@ -1,4 +1,5 @@
 import { Call, Order } from "@prisma/client";
+import config from "@src/config";
 import db from "@src/db";
 import moment = require("moment");
 
@@ -40,7 +41,7 @@ export default class OrderManager {
   }
 
   static async getUnassignedOrders(): Promise<Order[]> {
-    const _20minutesAgo = moment().add(-20, 'minute').toDate()
+    const _20minutesAgo = moment().add(-config.AUTOASSIGN_TIMOUT_MINUTES, 'minute').toDate()
     const orders = await db.order.findMany({ where: { 
       masterId: null,
       updatedAt: {
