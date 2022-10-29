@@ -12,7 +12,6 @@ server.set('view engine', 'pug');
 server.set('views', path.join(__dirname, 'views'));
 
 server.use('/api', express.json());
-server.use('/api/v1/calls/entry', m.none());
 server.use(`/bot${config.BOT_TOKEN}`, express.json());
 server.use(`/order-form`, express.urlencoded());
 server.use(`/warranty-form`, express.urlencoded());
