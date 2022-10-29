@@ -96,14 +96,15 @@ export function dispatcherOrderInlineKB(order: Order) {
   return inline_keyboard;
 }
 
-export function callMessage(dto: Call) {
+export function callMessage(call: Call) {
   return (
-    `${dto.type === CallTypes.IN ? "Входящий" : "Исходящий"} звонок\n\n` +
-    `<b>Поступил</b>: ${moment(dto.date).format("DD.MM.YYYY hh:mm:ss")}\n` +
-    `#СВЯЗЬ${dto.clientPhone}\n` +
-    `<b>Номер</b>: ${dto.clientPhone}\n` +
-    `<b>Продолжительность</b>: ${dto.duration} сек.\n` +
-    `<b>Запись</b>: <a href="${dto.recordLink}">${dto.recordLink}</a>\n`
+    `${call.type === CallTypes.IN ? "Входящий" : "Исходящий"} звонок\n` +
+    `${call.status} звонок\n\n` +
+    `<b>Поступил</b>: ${moment(call.date).format("DD.MM.YYYY hh:mm:ss")}\n` +
+    `#СВЯЗЬ${call.clientPhone}\n` +
+    `<b>Номер</b>: ${call.clientPhone}\n` +
+    `<b>Продолжительность</b>: ${call.duration} сек.\n` +
+    `<b>Запись</b>: <a href="${call.recordLink}">${call.recordLink}</a>\n`
   );
 }
 
