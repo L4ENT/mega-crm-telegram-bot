@@ -36,7 +36,10 @@ export const callsEntry = async (
     await teAgent.events.onNewCall(dto);
     res.status(200).json({});
   } else {
-    console.log("Not History:", body);
+    console.log("Not History:", {
+      body: req.body,
+      headers: req.headers
+    });
     res.status(200).json({});
   }
 };
