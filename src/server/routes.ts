@@ -1,7 +1,6 @@
 import moment = require("moment");
 import fs = require("fs");
 import db from "../db";
-import TelegramApp from "../apps/telegram/TelegramApp";
 import CallDto from "@src/dto/CallDto";
 import TeAgent from "@src/agents/te/TeAgent";
 import ManagerAgent from "@src/agents/manager/ManagerAgent";
@@ -10,6 +9,7 @@ import config from "@src/config";
 import createReport from "docx-templates";
 import WarrantyManager from "@src/managers/WarrantyManager";
 import MasterAgent from "@src/agents/master/MasterAgent";
+import TelegramApp from "@src/apps/telegram/TelegramApp";
 /**
  * Handles every Telephone exchange API event
  * @param req
@@ -20,7 +20,7 @@ export const callsEntry = async (
   res: import("express").Response
 ) => {
   const { body } = req;
-
+  console.log('Call Entry:', body)
   const dto = new CallDto(
     body.type.toUpperCase(),
     body.status.toUpperCase(),
