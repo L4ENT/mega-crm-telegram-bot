@@ -87,6 +87,14 @@ html
                            value=order.additionalPhone
                         )
                   div.field-wrapper
+                     label(for="departureDate") Дата и время выезда
+                        input(
+                           name='departureDate',
+                           placeholder='Выберите дату и время',
+                           type='datetime-local'
+                           value=order.departureDate
+                        )
+                  div.field-wrapper
                      label(for="fullAddress") Адрес
                         textarea(
                            rows="7"

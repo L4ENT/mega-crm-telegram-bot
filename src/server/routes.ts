@@ -38,7 +38,7 @@ export const callsEntry = async (
   } else {
     console.log("Not History:", {
       body: req.body,
-      headers: req.headers
+      headers: req.headers,
     });
     res.status(200).json({});
   }
@@ -101,6 +101,9 @@ export const orderFormPage = async (
         clientName: req.body.clientName,
         additionalPhone: req.body.additionalPhone,
         fullAddress: req.body.fullAddress,
+        departureDate: req.body.departureDate
+          ? moment(req.body.departureDate).toDate()
+          : null,
         defect: req.body.defect,
         brand: req.body.brand,
         model: req.body.model,
@@ -142,8 +145,18 @@ export const orderFormPage = async (
   }
 
   const deviceTypes = await db.deviceType.findMany();
+  const departureDateMoment = order.departureDate
+    ? moment(order.departureDate)
+    : moment();
 
-  res.render("order-form", { order, submited, deviceTypes });
+  res.render("order-form", {
+    order: {
+      ...order,
+      departureDate: departureDateMoment.format("YYYY-MM-DDTHH:mm"),
+    },
+    submited,
+    deviceTypes,
+  });
 };
 
 /**
@@ -176,7 +189,6 @@ export const warrantyFormPage = async (
   let submited = false;
 
   if (req.method == "POST") {
-    console.log(req.body);
     warranty = await db.warranty.update({
       where: { id: warranty.id },
       data: {

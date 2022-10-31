@@ -21,6 +21,9 @@ export async function orderMessageForDispatcher(order: Order) {
     `#СВЯЗЬ${order.clientPhone}\n` +
     `<b>Номер телефона</b>: ${order.clientPhone}\n` +
     `<b>Доп. номер телефона</b>: ${order.additionalPhone}\n` +
+    `<b>Дата выезда</b>: ${moment(order.departureDate).format(
+      "DD.MM.YYYY HH:mm"
+    )}\n` +
     `<b>Адрес</b>: ${order.fullAddress}\n` +
     `<b>Неисправность</b>: ${order.defect}\n` +
     `<b>Марка</b>: ${order.brand}\n` +
@@ -51,6 +54,9 @@ export async function orderMessageForMaster(order: Order) {
     `#СВЯЗЬ${order.clientPhone}\n` +
     `<b>Номер телефона</b>: ${order.clientPhone}\n` +
     `<b>Доп. номер телефона</b>: ${order.additionalPhone}\n` +
+    `<b>Дата выезда</b>: ${moment(order.departureDate).format(
+      "DD.MM.YYYY HH:mm"
+    )}\n` +
     `<b>Адрес</b>: ${order.fullAddress}\n` +
     `<b>Неисправность</b>: ${order.defect}\n` +
     `<b>Марка</b>: ${order.brand}\n` +

@@ -15,4 +15,7 @@ export default {
   AUTOASSIGN_TIMOUT_MINUTES: process.env.DEFAULT_MASTER_CRON
     ? parseInt(process.env.DEFAULT_MASTER_CRON)
     : 20,
+  MOMENT_FORMAT_OFFSET: process.env.MOMENT_FORMAT_OFFSET
+    ? parseInt(process.env.MOMENT_FORMAT_OFFSET)
+    : 5,
 };

@@ -55,7 +55,7 @@ model MessagerUser {
 
   uid      String  @db.VarChar(256)
   fullName String? @map("full_name")
-  username String? 
+  username String?
 
   channels MessagerUserChannel[]
   chats    MessagerChat[]
@@ -161,6 +161,7 @@ model Order {
   defect          String?       @db.VarChar(128)
   brand           String?       @db.VarChar(128)
   model           String?       @db.VarChar(128)
+  departureDate   DateTime?     @map("departure_date") @db.Timestamptz(3)
   deviceTypeId    Int?          @map("device_type_id")
   deviceType      DeviceType?   @relation(fields: [deviceTypeId], references: [id], onDelete: SetNull)
   status          OrderStatuses @default(NEW)
@@ -216,7 +217,7 @@ model DeviceType {
   title  String  @db.VarChar(128)
   orders Order[]
 
-  defaultMasterId Int? @map("default_master_id")
+  defaultMasterId Int?  @map("default_master_id")
   defaultMaster   User? @relation(fields: [defaultMasterId], references: [id])
 
   @@map(name: "device_types")

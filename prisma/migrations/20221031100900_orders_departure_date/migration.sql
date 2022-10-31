@@ -1,0 +1,2 @@
+-- AlterTable
+ALTER TABLE "orders" ADD COLUMN     "departure_date" TIMESTAMPTZ(3) DEFAULT CURRENT_TIMESTAMP;
