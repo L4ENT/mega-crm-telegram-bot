@@ -106,7 +106,7 @@ export function callMessage(call: Call) {
   return (
     `${call.type === CallTypes.IN ? "Входящий" : "Исходящий"} звонок\n` +
     `${call.status}\n\n` +
-    `<b>Поступил</b>: ${moment(call.date).format("DD.MM.YYYY hh:mm:ss")}\n` +
+    `<b>Поступил</b>: ${moment(call.date).format("DD.MM.YYYY HH:mm:ss")}\n` +
     `#СВЯЗЬ${call.clientPhone}\n` +
     `<b>Номер</b>: ${call.clientPhone}\n` +
     `<b>Продолжительность</b>: ${call.duration} сек.\n` +
