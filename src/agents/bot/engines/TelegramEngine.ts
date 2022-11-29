@@ -437,7 +437,7 @@ export default class TelegramEngine implements MessagerEngineInterface {
     warranty: Warranty
   ): Promise<any> {
     const message =
-      `Гарантия на заявку №${warranty.orderId}\n` +
+      `Гарантия на заявку №${warranty.orderId}\n\n` +
       `<b> Итого за запчасти </b>: ${warranty.sparesPrice} руб.\n` +
       `<b> Итого за работу </b>: ${warranty.workPrice} руб.\n`;
     await this.sendMessage(chatId, message, {
